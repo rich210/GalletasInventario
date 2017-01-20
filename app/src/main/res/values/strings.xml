@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">GalletasInventariosV2</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="emptyFields">Empty Fields</string>
+    <string name="select">Seleccione</string>
+
+    <string name="takePicture">Tomar foto</string>
+    <string name="chooseFromGallery">Elegir desde galeria</string>
+    <string name="cancel">Cancelar</string>
+    <string name="chooseOption">Elegir Opciòn</string>
+
+    <string name="errorRecipeForm">Los productos no son validos</string>
+    <string name="recipeFormQuantity">Cantidad</string>
+</resources>

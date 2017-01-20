@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2016 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<resources>
+    <string-array name="pictureOptions">
+        <item>@string/takePicture</item>
+        <item>@string/chooseFromGallery</item>
+        <item>@string/cancel</item>
+    </string-array>
+
+    <string-array name="recipesName">
+        <item>Pastel de chocolates</item>
+        <item>Galletas</item>
+        <item>Pie</item>
+        <item>Pan de Muerto</item>
+        <item>Cup cakes</item>
+        <item>Brownies</item>
+        <item>Pizza</item>
+    </string-array>
+    <string-array name="recipesInstructions">
+        <item>papapapapa lalala nananana lalalala</item>
+        <item>lalalala papapa lala pa</item>
+        <item> sim sim sim o nao nao nao</item>
+        <item>Mulher pra mi tem que tener a escrita</item>
+        <item>ia ia ia sao bento me chama</item>
+        <item>no mercado modelo tem que tener axe</item>
+        <item>Meu berimbao faz tin tin don don</item>
+    </string-array>
+    <array name="recipes_pictures">
+        <item>@mipmap/image_cake_2</item>
+        <item>@mipmap/image_galletas</item>
+        <item>@mipmap/image_pie</item>
+        <item>@mipmap/image_pan_muerto</item>
+        <item>@mipmap/image_cupcakes</item>
+        <item>@mipmap/image_pizza</item>
+    </array>
+    <string-array name="ordersClientNames">
+        <item>Liz Guillen</item>
+        <item>+52 99913252</item>
+        <item>Ely Guillen</item>
+        <item>Ricardo</item>
+        <item>Carlos</item>
+        <item>richard@gmail.com</item>
+        <item>+529945445</item>
+    </string-array>
+    <string-array name="orderNumber">
+        <item>5528</item>
+        <item>5529</item>
+        <item>5530</item>
+        <item>5531</item>
+        <item>5532</item>
+        <item>5533</item>
+        <item>5534</item>
+    </string-array>
+    <string-array name="orderDeliveryDate">
+        <item>28/11/16</item>
+        <item>01/12/16</item>
+        <item>10/12/16</item>
+        <item>03/01/17</item>
+        <item>10/01/17</item>
+        <item>15/01/17</item>
+        <item>16/01/17</item>
+    </string-array>
+    <string-array name="orderStates">
+        <item>Entregado</item>
+        <item>Trabajando</item>
+        <item>Espera</item>
+        <item>Espera</item>
+        <item>Entregado</item>
+        <item>Espera</item>
+        <item>Espera</item>
+    </string-array>
+</resources>

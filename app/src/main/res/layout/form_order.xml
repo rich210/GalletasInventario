@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.orders.FormOrder">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin">
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:hint="Nombre del Cliente"
+                android:id="@+id/etClientName"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvFechaEntrega"
+                android:text="Fecha de entrega"
+                android:textColor="@color/colorPrimaryTextDark"
+                android:textSize="17dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/etClientName"/>
+            <DatePicker
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/tvFechaEntrega"
+                android:onClick="showDatePickerDialog"
+                android:id="@+id/cwOrderDeliveryDate"
+                android:textColor="@color/colorPrimaryText"
+                android:datePickerMode="spinner"
+                android:calendarViewShown="false"/>
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/cwOrderDeliveryDate"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="20dp"
+                android:id="@+id/tlRecipes">
+                <TableRow>
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.4"
+                        android:text="Spinner de recetas"
+                        android:id="@+id/spinnerRecipes"
+                        android:layout_marginLeft="50dp"
+                        android:layout_marginRight="50dp"
+                        android:textAlignment="center"/>
+                </TableRow>
+                <TableRow
+                    android:layout_margin="5dp">
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.25"
+                        android:text="Cantidad"
+                        android:id="@+id/txtQuantity"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.25"
+                        android:text="X Porcion"
+                        android:textSize="18dp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/colorPrimaryTextDark"
+                        android:id="@+id/txtPortion"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.25"
+                        android:text="= Total"
+                        android:textSize="18dp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/colorPrimaryTextDark"
+                        android:id="@+id/txtTotalPortion"/>
+                </TableRow>
+                <TableRow
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.25"
+                        android:text="Costo U."
+                        android:textSize="18dp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/colorPrimaryTextDark"
+                        android:id="@+id/txtCostPerRecipe"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.25"
+                        android:text="= Total"
+                        android:textSize="18dp"
+                        android:paddingTop="6dp"
+                        android:textColor="@color/colorPrimaryTextDark"
+                        android:id="@+id/txtTotalRecipes"/>
+
+
+                </TableRow>
+                <TableRow>
+                    <ImageButton
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:id="@+id/btnRemoveProduct"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_minus"
+                        android:background="@color/colorPrimary"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:padding="2dp"/>
+                    <ImageButton
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:id="@+id/btnAddProduct"
+                        android:src="@drawable/ic_add"
+                        android:layout_weight="1"
+                        android:background="@color/colorPrimary"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginRight="20dp"
+                        android:padding="2dp"/>
+                </TableRow>
+
+            </TableLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:text="Costo total de produccion"
+                android:id="@+id/txtTotalCost"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/tlRecipes"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:hint="Venta"
+                android:id="@+id/etSell"
+                android:layout_below="@id/txtTotalCost"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.25"
+                android:text="Ganancia"
+                android:id="@+id/txtGain"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/etSell"/>
+
+            <Button
+                android:id="@+id/saveProductButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtGain"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="39dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@color/colorPrimary"
+                android:text="  Guardar"
+                android:drawableLeft="@drawable/ic_save"
+                android:padding="15dp"
+                android:textColor="@color/colorPrimaryText" />
+        </RelativeLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#e91e63</color>
+    <color name="colorSecondary">#f48fb1</color>
+    <color name="colorPrimaryDark">#C2185B</color>
+    <color name="colorAccent">#FF9800</color>
+    <color name="colorPrimaryText">#ffffff</color>
+    <color name="colorPrimaryTextDark">#000</color>
+    <color name="listPrimary">#ffffff</color>
+    <color name="listSecondary">#a1a1a1</color>
+    <color name="listBackground">#c9c9c9</color>
+    <color name="colorPrimaryTextBackgroun">#cb000000</color>
+    <color name="trasparent">#00ffffff</color>
+    <color name="defaultBackground">#e4e4e4</color>
+    <color name="itemListBackgroundSecondary">#f48fb1</color>
+    <color name="itemListBackgroundPrimary">#ffffff</color>
+    <color name="itemProductLowerThanMin">#ff6d6d</color>
+</resources>

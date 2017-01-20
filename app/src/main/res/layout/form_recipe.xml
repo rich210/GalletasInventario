@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context=".views.recipes.FormRecipe">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtRecipeId"
+            android:visibility="gone"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre de la receta"
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/etRecipeName"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etRecipeName"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:id="@+id/llMainProducts">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/llProductContainer">
+                <Spinner
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:spinnerMode="dropdown"
+                    android:scrollbarSize="15dp"
+                    android:id="@+id/spinnerProduct"
+                    android:layout_marginLeft="50dp"
+                    android:layout_marginRight="50dp"
+                    android:textAlignment="center"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="1"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@id/spinnerProduct"
+                    android:id="@+id/llProduct">
+
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.5"
+                        android:hint="Producto"
+                        android:id="@+id/txtQuantity"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.3"
+                        android:textSize="15dp"
+                        android:paddingTop="10dp"
+                        android:textColor="@color/colorPrimaryTextBackgroun"
+                        android:id="@+id/txtMeasureSymbol"/>
+
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <ImageButton
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnAddProduct"
+            android:src="@drawable/ic_add"
+            android:layout_below="@id/llMainProducts"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="20dp"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textAlignment="center"
+            android:inputType="number"
+            android:id="@+id/etRecipePortions"
+            android:layout_below="@id/btnAddProduct"
+            android:hint="Porciones"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Instruciones"
+            android:textAlignment="center"
+            android:padding="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/etRecipeInstruccions"
+            android:layout_below="@id/etRecipePortions"
+            android:inputType="textMultiLine"
+            android:minLines="6"
+            android:maxLines="20"/>
+
+        <Button
+            android:id="@+id/btnTakePictureRecipe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/etRecipeInstruccions"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="39dp"
+            android:layout_marginRight="80dp"
+            android:layout_marginLeft="80dp"
+            android:background="@color/colorPrimary"
+            android:text="Tomar Foto"
+            android:drawableLeft="@drawable/ic_menu_camera"
+            android:padding="15dp"
+            android:textColor="@color/colorPrimaryText"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="15dp"
+            android:id="@+id/ivRecipeImageTumb"
+            android:layout_below="@id/btnTakePictureRecipe"
+            android:layout_centerInParent="true"
+            android:adjustViewBounds="true"/>
+
+
+        <Button
+            android:id="@+id/saveRecipeButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ivRecipeImageTumb"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="39dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginLeft="50dp"
+            android:background="@color/colorPrimary"
+            android:text="Guardar"
+            android:drawableLeft="@drawable/ic_save"
+            android:padding="15dp"
+            android:textColor="@color/colorPrimaryText"
+            />
+
+        <ProgressBar
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_below="@id/ivRecipeImageTumb"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="30dp"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:id="@+id/loading"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+
+</ScrollView>
