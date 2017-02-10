@@ -6,6 +6,34 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="requiredErrorText"> es requerido</string>
+    <string name="updateErrorText">Error tratando de actualizar</string>
+    <string name="insertErrorText">Error tratando de insertar</string>
+    <string name="deleteErrorText">Error tratando de eliminar</string>
+
+    <string name="dialogDeleteTitle">Eliminar</string>
+
+    <!-- Measurement Form Text  -->
+    <string name="measurementFormAddTitle">Añadir medida</string>
+    <string name="measurementFormUpdateTitle">Modificar medida</string>
+    <string name="measurementFormSpinnerErrorText">Selecione un tipo de medida</string>
+
+
+    <!-- Product Form Text  -->
+    <string name="productFormAddTitle">Añadir producto</string>
+    <string name="productFormUpdateTitle">Modificar producto</string>
+
+    <!--Main Recipe Form Texts-->
+    <string name="recipeDiaglogConfirmationText">¿Seguro quieres eliminar la receta?</string>
+    <string name="recipeMultipleSelectionErrorText">Error: Mas de una receta a sido seleccionada</string>
+    <!-- Recipe Form Text  -->
+    <string name="recipeFormAddTitle">Añadir receta</string>
+    <string name="recipeFormUpdateTitle">Modificar receta</string>
+
+    <!-- Order Form Text  -->
+    <string name="ordenFormAddTitle">Añadir orden</string>
+    <string name="ordenFormUpdateTitle">Modificar orden</string>
+
     <string name="emptyFields">Empty Fields</string>
     <string name="select">Seleccione</string>
 

@@ -1,6 +1,7 @@
 package com.example.resparza.galletasinventariosv2.views.recipes;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -9,15 +10,18 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
@@ -53,6 +57,8 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
     private FloatingActionButton efab;
+
+    private RecyclerView recyclerView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -91,24 +97,22 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        List<Recipe> recipes = getRecipes();
+        RecipeContentAdapter adapter = new RecipeContentAdapter(recyclerView.getContext(),recipes);
+        adapter.clearSelectedIds();
+        recyclerView.setAdapter(adapter);
+        initFloatingActionButtons();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
+        recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
-        RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(recyclerView.getContext());
-        List<Recipe> recipes = null;
-        try {
-            recipeDBAdapter.open();
-            recipes = recipeDBAdapter.getAllItems();
-        }catch (SQLiteException e){
-            Log.e(TAG, "Error:"+ e.getMessage());
-            //Add ui if list is empty
-        } catch (SQLException e) {
-            Log.e(TAG, "Error:"+ e.getMessage());
-        }finally {
-            recipeDBAdapter.close();
-        }
+        List<Recipe> recipes = getRecipes();
         if (recipes == null || recipes.isEmpty()){
             Intent intent = new Intent(getActivity(), FormRecipe.class);
             intent.putExtra(IS_UPDATE,false);
@@ -118,8 +122,6 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //recyclerView.setBackgroundResource(R.color.colorSecondary);
-
         initFloatingActionButtons();
 
         return recyclerView;
@@ -131,6 +133,7 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
         afab.setOnClickListener(this);
         dfab = ((MainActivity)getActivity()).getDeleteFAB();
         dfab.setVisibility(View.GONE);
+        dfab.setOnClickListener(this);
         efab = ((MainActivity)getActivity()).getEditFAB();
         efab.setVisibility(View.VISIBLE);
         efab.setOnClickListener(this);
@@ -138,9 +141,10 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        //SparseBooleanArray selected;
+        SparseBooleanArray selected;
         Intent intent;
         Long selectedId;
+        RecipeContentAdapter adapter = (RecipeContentAdapter) recyclerView.getAdapter();
         short size;
         switch (v.getId()) {
             case R.id.Addfab:
@@ -149,43 +153,106 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
                 startActivityForResult(intent, REQUEST_CODE_ADD_RECIPE);
                 break;
             case R.id.Editfab:
-                //selected = mAdapter.getSelectedIds();
-                //size = (short) selected.size();
-                //if (size > 1) {
-//                    Toast.makeText(ProductMainActivity.this, "More that one product is selected", Toast.LENGTH_SHORT).show();
-                //} else if (size == 1) {
+                selected = adapter.getSelectedIds();
+                size = (short) selected.size();
+                if (size > 1) {
+                    Toast.makeText(recyclerView.getContext(), getText(R.string.recipeMultipleSelectionErrorText), Toast.LENGTH_SHORT).show();
+                } else if (size == 1) {
                 intent = new Intent(getActivity(), FormRecipe.class);
-                //selectedId = mAdapter.getItemId(selected.keyAt(0));
+                selectedId = adapter.getItemId(selected.keyAt(0));
                 intent.putExtra(IS_UPDATE,true);
-                //intent.putExtra(EXTRA_SELECTED_PRODUCT_ID, selectedId);
+                intent.putExtra(EXTRA_SELECTED_RECIPE_ID, selectedId);
                 startActivityForResult(intent, REQUEST_CODE_MODIFY_RECIPE);
-                //}
+                }
                 break;
             case R.id.Deletefab:
-                //showDeleteDialogConfirmation();
-                /*
-                selected = mAdapter.getSelectedIds();
-                size = (short) selected.size();
-                long ids[] = new long[size];
-                for (int i = 0; i < size; i++) {
-                    if (selected.valueAt(i)) {
-                        selectedId = mAdapter.getItemId(selected.keyAt(i));
-                        ids[i] = selectedId;
-                    }
-                }
-                if (productDBAdapter.deleteItemsByIds(ids)) {
-                    Log.d(TAG, "Deleted " + size + " products");
-                    Toast.makeText(ProductMainActivity.this, "Deleted " + size + " products", Toast.LENGTH_SHORT).show();
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Error trying to delete products");
-                    Toast.makeText(ProductMainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                }*/
+                showDeleteDialogConfirmation();
+
                 break;
 
             default:
                 break;
         }
+    }
+
+    private List<Recipe> getRecipes(){
+        List<Recipe> recipes = null;
+        RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(recyclerView.getContext());
+        try {
+            recipeDBAdapter.open();
+            recipes = recipeDBAdapter.getAllItems();
+        }catch (SQLiteException e){
+            Log.e(TAG, "Error:"+ e.getMessage());
+            //Add ui if list is empty
+        } catch (SQLException e) {
+            Log.e(TAG, "Error:"+ e.getMessage());
+        }finally {
+            recipeDBAdapter.close();
+        }
+
+        return recipes;
+    }
+
+
+    private void showDeleteDialogConfirmation() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
+
+        alertDialogBuilder.setTitle(getString(R.string.dialogDeleteTitle));
+        alertDialogBuilder
+                .setMessage(getString(R.string.recipeDiaglogConfirmationText));
+
+
+        alertDialogBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                RecipeContentAdapter adapter = (RecipeContentAdapter) recyclerView.getAdapter();
+                Long selectedId;
+                short size;
+                SparseBooleanArray selected;
+                RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(recyclerView.getContext());
+                selected = adapter.getSelectedIds();
+                size = (short) selected.size();
+                long ids[] = new long[size];
+                for (int i = 0 ; i<(size); i++){
+                    if (selected.valueAt(i)){
+                        selectedId = adapter.getItemId(selected.keyAt(i));
+                        adapter.toggleSelection(selected.keyAt(i));
+                        ids[i] = selectedId;
+                    }
+                }
+                try {
+                    recipeDBAdapter.open();
+                    if (recipeDBAdapter.deleteItemsByIds(ids)) {
+                        Toast.makeText(recyclerView.getContext(), "Deleted " +size +" recipes", Toast.LENGTH_SHORT).show();
+                        adapter.notifyDataSetChanged();
+                        onResume();
+                    }else{
+                        Log.e(TAG, "Error trying to delete recipes");
+                        Toast.makeText(recyclerView.getContext(), getText(R.string.deleteErrorText), Toast.LENGTH_SHORT).show();
+                    }
+                    recipeDBAdapter.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        // set neutral button OK
+        alertDialogBuilder.setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show alert
+        alertDialog.show();
     }
 
 }

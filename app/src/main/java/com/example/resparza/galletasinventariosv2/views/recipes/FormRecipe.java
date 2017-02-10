@@ -35,9 +35,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.resparza.galletasinventariosv2.R;
+import com.example.resparza.galletasinventariosv2.adapters.SpinnerMeasureTypesAdapter;
 import com.example.resparza.galletasinventariosv2.adapters.SpinnerProductAdapter;
+import com.example.resparza.galletasinventariosv2.dbadapters.MeasureTypeDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.ProductDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.RecipeDBAdapter;
+import com.example.resparza.galletasinventariosv2.models.MeasureType;
 import com.example.resparza.galletasinventariosv2.models.Product;
 import com.example.resparza.galletasinventariosv2.models.Recipe;
 import com.example.resparza.galletasinventariosv2.models.RecipeProduct;
@@ -70,11 +73,6 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     private TextView tvRecipeId;
     private EditText etRecipeName;
     private LinearLayout llMainProducts;
-    private Spinner spinnerProduct;
-    private LinearLayout llProducts;
-    private EditText etQuantity;
-    private TextView tvMeasureSymbol;
-    private ImageButton ibRemoveProduct;
     private ImageButton ibAddProduct;
     private EditText etRecipePortions;
     private EditText etRecipeInstructions;
@@ -84,11 +82,10 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     private ProgressBar progressBar;
 
     private ArrayList<Integer> linearLayoutIds;
+    private ArrayList<Long> productsIds;
     private int numberOfLinearLayout = 1;
     private ArrayList<LinearLayout> linearLayoutArray;
     //private LinearLayout[] linearLayoutArray = new LinearLayout[20];
-    private ProductDBAdapter productDBAdapter;
-    private SpinnerProductAdapter mAdapter;
     private String mCurrentPhotoPath;
     private boolean isUpdate;
     private Bitmap recipeImage;
@@ -99,26 +96,47 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.form_recipe);
         linearLayoutArray = new ArrayList<LinearLayout>();
         linearLayoutIds = new ArrayList<Integer>();
+        productsIds = new ArrayList<Long>();
         recipeImage = null;
         initView();
         Intent intent = getIntent();
         String tittle;
 
-        this.spinnerProduct.setAdapter(getProducts());
         isUpdate = intent.getExtras().getBoolean(MainRecipes.IS_UPDATE);
         if (isUpdate) {
             //long id = intent.getExtras().getLong(MeasureTypeMainActivity.EXTRA_SELECTED_MEASURE_ID);
             //if (id != 0) {
             //loadMeasureType(id);
-            tittle = "Actualizar receta";
+            tittle = getResources().getString(R.string.recipeFormUpdateTitle);
 
             //}
         } else {
-            tittle = "Agrega receta";
+            tittle = getResources().getString(R.string.recipeFormAddTitle);
         }
         setTitle(tittle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode == RESULT_OK){
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bundle extras = data.getExtras();
+                recipeImage = (Bitmap) extras.get("data");
+            }else{
+                if (data != null) {
+                    try {
+                        recipeImage = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            recipeImage = ThumbnailUtils.extractThumbnail(recipeImage,400,400);
+            ivRecipeImage.setImageBitmap(recipeImage);
+        }
     }
 
     @Override
@@ -134,15 +152,13 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    /**
+     * Initialize all the layout components
+     */
     private void initView() {
         this.tvRecipeId = (TextView) findViewById(R.id.txtRecipeId);
         this.etRecipeName = (EditText) findViewById(R.id.etRecipeName);
         this.llMainProducts = (LinearLayout) findViewById(R.id.llMainProducts);
-        this.spinnerProduct = (Spinner)findViewById(R.id.spinnerProduct);
-        //this.llProducts = (LinearLayout)findViewById(R.id.llProduct);
-        //this.etQuantity = (EditText)findViewById(R.id.eTQuantity);
-        //this.tvMeasureSymbol = (TextView)findViewById(R.id.txtMeasureSymbol);
-        //this.ibRemoveProduct = (ImageButton)findViewById(R.id.btnRemoveProduct);
         this.ibAddProduct = (ImageButton) findViewById(R.id.btnAddProduct);
         this.btnTakePicture = (Button) findViewById(R.id.btnTakePictureRecipe);
         this.etRecipePortions = (EditText) findViewById(R.id.etRecipePortions);
@@ -150,31 +166,12 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         this.ivRecipeImage = (ImageView)findViewById(R.id.ivRecipeImageTumb);
         this.bSaveRecipe = (Button)findViewById(R.id.saveRecipeButton);
         this.progressBar = (ProgressBar)findViewById(R.id.loading);
-        LinearLayout productContainer = (LinearLayout) findViewById(R.id.llProductContainer);
-        linearLayoutArray.add(productContainer);
-        //linearLayoutArray[numberOfLinearLayout - 1] = productContainer;
-        linearLayoutIds.add(new Integer(productContainer.getId())) ;
 
         this.bSaveRecipe.setOnClickListener(this);
         this.btnTakePicture.setOnClickListener(this);
         this.ibAddProduct.setOnClickListener(this);
-        this.spinnerProduct.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Product product = (Product) parent.getItemAtPosition(position);
-                ViewGroup container = (ViewGroup)parent.getParent();
-                ViewGroup linearLayoutContainer = (ViewGroup)container.getChildAt(1);
-                TextView tvMeasureSymbol = (TextView) linearLayoutContainer.getChildAt(1);
-                if(product.getProductId()>0){
-                    tvMeasureSymbol.setText(product.getMeasureType().getMeasureSymbol());
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
 
-            }
-        });
-        //this.ibRemoveProduct.setOnClickListener(this);
+        addProductForm();
 
     }
 
@@ -201,25 +198,35 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    /**
+     * Add layouts for products
+     */
     public void addProductForm() {
         if (numberOfLinearLayout <= 19) {
-            //RelativeLayout.LayoutParams productRelativeLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            //productRelativeLayoutParams.addRule(RelativeLayout.BELOW, linearLayoutArray[numberOfLinearLayout - 1].getId());
-            //productRelativeLayoutParams.addRule(RelativeLayout.BELOW, linearLayoutIds.get(linearLayoutIds.size()-1));
-            //productRelativeLayoutParams.addRule(RelativeLayout.ALIGN_TOP, linearLayoutArray[numberOfLinearLayout - 1].getId());
+
             LinearLayout.LayoutParams llProductParamas = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             LinearLayout llProductContainer = new LinearLayout(this);
             LinearLayout llProductQuantity = new LinearLayout(this);
             Spinner spinnerProduct = new Spinner(this);
+            Spinner spinnerMeasureSymbol = new Spinner(this);
+            EditText etProductQuantity = new EditText(this);
+            //TextView tvMeasureSymbol = new TextView(this);
+            ImageButton ibRemoveProduct = new ImageButton(this);
             spinnerProduct.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    long equivalencyId = 0;
                     Product product = (Product) parent.getItemAtPosition(position);
                     ViewGroup container = (ViewGroup)parent.getParent();
                     ViewGroup linearLayoutContainer = (ViewGroup)container.getChildAt(1);
-                    TextView tvMeasureSymbol = (TextView) linearLayoutContainer.getChildAt(1);
+                    Spinner spinnerMeasureSymbol = (Spinner) linearLayoutContainer.getChildAt(1);
                     if(product.getProductId()>0){
-                        tvMeasureSymbol.setText(product.getMeasureType().getMeasureSymbol());
+                        productsIds.add(new Long(product.getProductId()));
+                        equivalencyId = product.getMeasureType().getMeasureEquivalencyId();
+                        if(equivalencyId ==0){
+                            equivalencyId = product.getMeasureType().getMeasureTypeId();
+                        }
+                        spinnerMeasureSymbol.setAdapter(getMeasureTpes(equivalencyId));
                     }
                 }
                 @Override
@@ -227,11 +234,8 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
 
                 }
             });
-            EditText etProductQuantity = new EditText(this);
-            TextView tvMeasureSymbol = new TextView(this);
-            ImageButton ibRemoveProduct = new ImageButton(this);
 
-            //productRelativeLayoutParams.setMargins(50,0,50,0);
+
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(50, 0, 50, 0);
             spinnerProduct.setLayoutParams(layoutParams);
@@ -239,19 +243,22 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
 
             etProductQuantity.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.5f));
             etProductQuantity.setHint(R.string.recipeFormQuantity);
-            //etProductQuantity.setText("Quantity");
-            tvMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
-            //tvMeasureSymbol.setText("");
-            if (Build.VERSION.SDK_INT < 23) {
+            etProductQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            spinnerMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
+            /*if (Build.VERSION.SDK_INT < 23) {
                 tvMeasureSymbol.setTextAppearance(this, R.style.RecipeFormTextViewMeasurementSymbol);
             } else {
                 tvMeasureSymbol.setTextAppearance(R.style.RecipeFormTextViewMeasurementSymbol);
             }
             tvMeasureSymbol.setTextSize(15);
-            tvMeasureSymbol.setPadding(0,10,0,0);
+            tvMeasureSymbol.setPadding(0,10,0,0);*/
             ibRemoveProduct.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
             ibRemoveProduct.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_minus));
             ibRemoveProduct.setOnClickListener(this);
+
+            if (linearLayoutArray.size()== 0){
+                ibRemoveProduct.setVisibility(View.GONE);
+            }
 
             llProductContainer.setLayoutParams(llProductParamas);
             llProductContainer.setOrientation(LinearLayout.VERTICAL);
@@ -260,7 +267,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
             llProductParamas.setMargins(0, 10, 0, 0);
             llProductQuantity.setLayoutParams(llProductParamas);
             llProductQuantity.addView(etProductQuantity);
-            llProductQuantity.addView(tvMeasureSymbol);
+            llProductQuantity.addView(spinnerMeasureSymbol);
             llProductQuantity.addView(ibRemoveProduct);
 
             llProductContainer.addView(spinnerProduct);
@@ -268,7 +275,6 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
 
             linearLayoutIds.add(new Integer(llProductContainer.getId()));
             linearLayoutArray.add(llProductContainer);
-            //linearLayoutArray[numberOfLinearLayout] = llProductContainer;
 
             llMainProducts.addView(llProductContainer);
             numberOfLinearLayout++;
@@ -277,8 +283,15 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    /**
+     * Remove layout created to add the products for the recipe
+     * @param v is the button to check which layout is been clicked
+     */
     public void removeProductForm(View v){
         LinearLayout linearLayout = (LinearLayout)v.getParent().getParent();
+        Spinner productSpinner = (Spinner) linearLayout.getChildAt(0);
+        Product product = (Product) productSpinner.getSelectedItem();
+        productsIds.remove(new Long(product.getProductId()));
         linearLayoutIds.remove(new Integer(linearLayout.getId()));
         linearLayoutArray.remove(linearLayout);
         Log.d(TAG, linearLayoutIds.get(linearLayoutIds.size()-1).toString());
@@ -286,12 +299,16 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         llMainProducts.removeView(linearLayout);
     }
 
+    /**
+     * Get the product for the spinner
+     * @return an adapter for the spinner
+     */
     public SpinnerProductAdapter getProducts(){
         ProductDBAdapter productDBAdapter = new ProductDBAdapter(this);
         SpinnerProductAdapter spinnerAdapter = null;
         try {
             productDBAdapter.open();
-            List<Product> products = productDBAdapter.getAllItems();
+            List<Product> products = productDBAdapter.getAllItemsForSpinner(productsIds);
             if (products != null) {
                 spinnerAdapter = new SpinnerProductAdapter(this, products);
             }
@@ -304,6 +321,31 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         return spinnerAdapter;
     }
 
+    /**
+     * Get the measures for the spinner
+     * @return an adapter for the spinner
+     */
+    public SpinnerMeasureTypesAdapter getMeasureTpes(Long id){
+        MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(this);
+        SpinnerMeasureTypesAdapter spinnerAdapter = null;
+        try {
+            measureTypeDBAdapter.open();
+            List<MeasureType> measureTypes = measureTypeDBAdapter.getAllMeasureTypesByMeasureBase(id);
+            if (measureTypes != null) {
+                spinnerAdapter = new SpinnerMeasureTypesAdapter(this, measureTypes);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Log.e(TAG,"Error trying to obtain all measureTypes",e.getCause());
+        }finally {
+            measureTypeDBAdapter.close();
+        }
+        return spinnerAdapter;
+    }
+
+    /**
+     * Function that display the dialog activity with the options to obtain the picture
+     */
     private void selectImage() {
         final CharSequence[] items = getResources().getStringArray(R.array.pictureOptions);
 
@@ -315,13 +357,9 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                 //boolean result= Utility.checkPermission(this);
 
                 if (items[item].equals(getResources().getString(R.string.takePicture))) {
-                    //userChoosenTask="Take Photo";
-                    //if(result)
                     dispatchTakePictureIntent();
 
                 } else if (items[item].equals(getResources().getString(R.string.chooseFromGallery))) {
-                    //userChoosenTask="Choose from Library";
-                    //if(result)
                         galleryIntent();
 
                 } else if (items[item].equals(getResources().getString(R.string.cancel))) {
@@ -332,6 +370,9 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         builder.show();
     }
 
+    /**
+     * Function to start Camera activity and take the picture for the recipe
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -339,6 +380,9 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         }
     }
 
+    /**
+     * Start galerry activity to choose the picture for the recipe
+     */
     private void galleryIntent()
     {
         Intent intent = new Intent();
@@ -347,42 +391,6 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         startActivityForResult(Intent.createChooser(intent, "Seleccione una Imagen"),PICK_IMAGE_REQUEST);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if(resultCode == RESULT_OK){
-            if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                Bundle extras = data.getExtras();
-                recipeImage = (Bitmap) extras.get("data");
-            }else{
-                if (data != null) {
-                    try {
-                        recipeImage = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            recipeImage = ThumbnailUtils.extractThumbnail(recipeImage,400,400);
-            ivRecipeImage.setImageBitmap(recipeImage);
-        }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "cookie_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
-    }
 
     private String saveImageFile() throws IOException {
         // Create an image file name
@@ -469,4 +477,10 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
             }
         }
     }
+
+    private boolean isValid(){
+        boolean isValid = true;
+        return isValid;
+    }
+
 }

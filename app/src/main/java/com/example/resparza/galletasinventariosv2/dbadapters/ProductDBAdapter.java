@@ -195,7 +195,7 @@ public class ProductDBAdapter {
         initialValues.put(QUANTITY, product.getQuantity());
         initialValues.put(PRODUCT_MIN,product.getProductMin());
         initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
-        if (isUpdate) {
+        if (!isUpdate) {
             initialValues.put(CREATED_ON, sdf.format(new Date(0)));
         }
         return initialValues;
@@ -214,5 +214,34 @@ public class ProductDBAdapter {
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         }
+    }
+
+    public List<Product> getAllItemsForSpinner(List<Long> productIds){
+        List<Product> products = new ArrayList<Product>();
+        StringBuilder queryIds = new StringBuilder();
+        String selectQuery = null;
+        if(!productIds.isEmpty() && productIds != null){
+            for (Long id: productIds) {
+                if(queryIds.toString().isEmpty()){
+                    queryIds.append(id.toString());
+                }else{
+                    queryIds.append(", "+ id.toString());
+                }
+            }
+            selectQuery = "SELECT  * FROM " + PRODUCT_TABLE + " WHERE product_id not in ("+queryIds.toString() +")";
+        }else {
+            selectQuery = "SELECT  * FROM " + PRODUCT_TABLE;
+        }
+        Cursor c = this.mDb.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Product prod = cursorToItem(c);
+                products.add(prod);
+            } while (c.moveToNext());
+        }
+        return products;
+
     }
 }

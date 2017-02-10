@@ -81,16 +81,33 @@ public class RecipeDBAdapter {
     }
 
     public boolean deleteItemsByIds(long recipeIds[]) {
+        RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
+        boolean isDeleted = true;
         StringBuilder whereClause = new StringBuilder();
         whereClause.append(RECIPE_ID + " IN (");
-        for (int i = 0; i <= recipeIds.length; i++) {
-            if (i < recipeIds.length)
-                whereClause.append(recipeIds[i] + ",");
-            else
-                whereClause.append(recipeIds[i]);
+        try {
+            recipeProductDBAdapter.open();
+            for (int i = 0; i <= recipeIds.length- 1; i++) {
+                if (i < recipeIds.length - 1)
+                    whereClause.append(recipeIds[i] + ",");
+                else
+                    whereClause.append(recipeIds[i]);
+            }
+            whereClause.append(")");
+            isDeleted = this.mDb.delete(RECIPE_TABLE, whereClause.toString(), null) > 0;
+            if (!isDeleted){
+                Log.e(TAG, "Error tryinn to delete in tbl_recipes");
+                return isDeleted;
+            }
+            isDeleted = recipeProductDBAdapter.deleteRecipeProductByRecipeIds(recipeIds);
+            if (!isDeleted)
+                Log.e(TAG, "Error tryinn to delete in tbl_recipe_product");
+            recipeProductDBAdapter.close();
+             //$NON-NLS-1$
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        whereClause.append(")");
-        return this.mDb.delete(RECIPE_TABLE, whereClause.toString(), null) > 0; //$NON-NLS-1$
+        return isDeleted;
     }
 
     /**
@@ -137,7 +154,7 @@ public class RecipeDBAdapter {
     }
 
     private Recipe cursorToItem(Cursor cursor) {
-
+        RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(this.mCtx);
         Recipe recipe = new Recipe();
         recipe.setRecipeId(cursor.getInt(cursor.getColumnIndex(RECIPE_ID)));
         recipe.setRecipeName(cursor.getString(cursor.getColumnIndex(RECIPE_NAME)));
@@ -153,6 +170,17 @@ public class RecipeDBAdapter {
         } catch (SQLException e) {
             Log.d(TAG, "Error trying to retrieve measure type for : " + recipe.getRecipeName() + " " + recipe.getRecipeId());
         }*/
+        try {
+            recipeProductDBAdapter.open();
+            List<RecipeProduct> recipeProducts = recipeProductDBAdapter.getAllItemsByRecipeId(recipe.getRecipeId());
+            recipe.setRecipeProducts(recipeProducts);
+            recipeProductDBAdapter.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error obtaining recipe products");
+        }
+
+
         return recipe;
 
     }
@@ -162,7 +190,7 @@ public class RecipeDBAdapter {
         values.put(RECIPE_NAME, recipe.getRecipeName());
         //values.put(MEASURE_TYPE_ID, recipe.getMeasureType().getMeasureTypeId());
         values.put(QUANTITY, recipe.getMeasureTypeQuantity());
-        values.put(RECIPE_COST, recipe.getRecipeCost());
+        values.put(RECIPE_COST, recipe.getRecipeCost(mCtx));
         values.put(IMAGE_PATH,recipe.getRecipeImagePath());
 
         values.put(UPDATED_ON, sdf.format(new Date(0)));

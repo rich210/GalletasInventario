@@ -35,7 +35,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
     private Spinner spinnerMeasureType;
     private Button btnAddMeasureType;
     private SpinnerMeasureTypesAdapter sAdapter;
-    private MeasureType measureType;
+    //private MeasureType measureType;
     private MeasureTypeDBAdapter mAdapter;
     private boolean isUpdate;
 
@@ -45,7 +45,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.form_measurement);
         Intent intent = getIntent();
         initView();
-        String tittle = "Agrega medida";
+        String tittle = getResources().getString(R.string.measurementFormAddTitle);
 
         //Adding Measurement types to the spinner
         mAdapter = new MeasureTypeDBAdapter(getApplicationContext());
@@ -61,7 +61,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
             long id = intent.getExtras().getLong(MainMeasurements.EXTRA_SELECTED_MEASURE_ID);
             if (id != 0) {
                 loadMeasureType(id);
-                tittle = "Actualizar medida";
+                tittle = getResources().getString(R.string.measurementFormUpdateTitle);
             }
         }
         setTitle(tittle);
@@ -95,72 +95,41 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View v) {
-        MeasureType selectedMeasure;
-        //MeasureType measureType;
-        Editable measureTypeName = txtMeasureTypeName.getText();
+        MeasureType measureType;
+        Boolean isError = false;
         Editable measureTypeId = txtMeasureTypeId.getText();
+        Editable measureTypeName = txtMeasureTypeName.getText();
         Editable measureSymbol = txtMeasureSymbol.getText();
         Editable quantityEquivalency = txtQuantityEquivalent.getText();
-        switch (v.getId()) {
-            case R.id.addMeasureTypeButton:
-                if (!isUpdate){
-                    if (!TextUtils.isEmpty(measureTypeName)) {
-                        // add the company to database
-                        measureType = new MeasureType();
-                        measureType.setMeasureTypeName(measureTypeName.toString());
-                        measureType.setMeasureSymbol(measureSymbol.toString());
-                        measureType.setMeasureBase(cbMeasureBase.isChecked());
-                        if (!cbMeasureBase.isChecked()) {
-                            measureType.setQuantityEquivalency(Integer.valueOf(quantityEquivalency.toString()));
-                            selectedMeasure = (MeasureType) spinnerMeasureType.getSelectedItem();
-                            if(selectedMeasure.getMeasureTypeId() == 0){
-                                Toast.makeText(this, "Seleccione un tipo de medida", Toast.LENGTH_LONG).show();
-                                break;
-                            }
-                            measureType.setMeasureEquivalencyId(selectedMeasure.getMeasureTypeId());
-                        }
-                        measureType.setMeasureTypeId(mAdapter.insertItem(measureType));
-                        Log.d(TAG, measureType.getInfo());
-                        if (measureType.getMeasureTypeId()>0){
-                            Log.d(TAG, "added type of measure : " + measureType.getMeasureTypeName() + " " + measureType.getMeasureTypeId());
-                            setResult(RESULT_OK);
-                            finish();
-
-                        }else {
-                            Log.d(TAG, "Error inserting type of measure");
-                        }
-                    }
-                    else {
-                        Toast.makeText(this, R.string.emptyFields, Toast.LENGTH_LONG).show();
-                    }
-                }else {
-                    if (!TextUtils.isEmpty(measureTypeName) && !TextUtils.isEmpty(measureTypeId)) {
-                        // add the company to database
-                        measureType.setMeasureTypeName(measureTypeName.toString());
-                        measureType.setMeasureSymbol(measureSymbol.toString());
-                        measureType.setMeasureBase(cbMeasureBase.isChecked());
-                        if (!cbMeasureBase.isChecked()) {
-                            measureType.setQuantityEquivalency(Integer.valueOf(quantityEquivalency.toString()));
-                            selectedMeasure = (MeasureType) spinnerMeasureType.getSelectedItem();
-                            measureType.setMeasureEquivalencyId(selectedMeasure.getMeasureTypeId());
-                        }
-                        Log.d(TAG, measureType.getInfo());
-                        if (mAdapter.updateItem(measureType)) {
-                            Log.d(TAG, "Updated type of measure : " + measureType.getMeasureTypeName() + " " + measureType.getMeasureTypeId());
-                            setResult(RESULT_OK);
-                            finish();
-
-                        } else {
-                            Log.d(TAG, "Error updating type of measure");
-                        }
-                    } else {
-                        Toast.makeText(this, R.string.emptyFields, Toast.LENGTH_LONG).show();
-                    }
+        MeasureType selectedMeasure = (MeasureType)spinnerMeasureType.getSelectedItem();
+        if(isValid(measureTypeId,measureTypeName,measureSymbol,quantityEquivalency,selectedMeasure)){
+            measureType = new MeasureType();
+            measureType.setMeasureTypeName(measureTypeName.toString());
+            measureType.setMeasureSymbol(measureSymbol.toString());
+            measureType.setMeasureBase(cbMeasureBase.isChecked());
+            if (!cbMeasureBase.isChecked()) {
+                measureType.setQuantityEquivalency(Integer.valueOf(quantityEquivalency.toString()));
+                measureType.setMeasureEquivalencyId(selectedMeasure.getMeasureTypeId());
+            }
+            if (isUpdate){
+                measureType.setMeasureTypeId(Long.getLong( measureTypeId.toString()));
+                isError = !mAdapter.updateItem(measureType);
+                if(isError){
+                    Log.e(TAG,getResources().getString(R.string.updateErrorText)+ measureType.toString());
+                    Toast.makeText(this, R.string.updateErrorText, Toast.LENGTH_LONG).show();
                 }
-
-                break;
-           default:
-                break;
+            }else{
+                measureType.setMeasureTypeId(mAdapter.insertItem(measureType));
+                if (measureType.getMeasureTypeId()<1){
+                    isError = true;
+                    Log.e(TAG,getResources().getString(R.string.insertErrorText)+ measureType.toString());
+                    Toast.makeText(this, R.string.insertErrorText, Toast.LENGTH_LONG).show();
+                }
+            }
+            if(!isError){
+                setResult(RESULT_OK);
+                finish();
+            }
         }
     }
 
@@ -178,7 +147,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
     }
 
     private void loadMeasureType(long id) {
-        //MeasureType measureType;
+        MeasureType measureType;
         try {
             measureType = mAdapter.getItemById(id);
             Log.d(TAG, measureType.getInfo());
@@ -198,5 +167,32 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
         }
 
 
+    }
+
+    private boolean isValid(Editable measureTypeId, Editable measureTypeName, Editable measureTypeSymbol, Editable quantityEquivalent, MeasureType selectedMeasure){
+        Boolean isValid = true;
+        if (measureTypeName.toString().isEmpty()){
+            this.txtMeasureTypeName.setError(txtMeasureTypeName.getHint()+" "+ getResources().getString(R.string.requiredErrorText));
+            isValid = false;
+        }
+        if (measureTypeSymbol.toString().isEmpty()){
+            this.txtMeasureSymbol.setError(txtMeasureSymbol.getHint()+" "+ getResources().getString(R.string.requiredErrorText));
+            isValid = false;
+        }
+        if(!this.cbMeasureBase.isChecked() && quantityEquivalent.toString().isEmpty()){
+            if (quantityEquivalent.toString().isEmpty()){
+                this.txtQuantityEquivalent.setError(txtQuantityEquivalent.getHint()+ getResources().getString(R.string.requiredErrorText));
+                isValid = false;
+            }
+            if (selectedMeasure.getMeasureTypeId()== 0){
+                Toast.makeText(this, getResources().getString(R.string.measurementFormSpinnerErrorText), Toast.LENGTH_LONG).show();
+                isValid = false;
+            }
+        }
+        if(isUpdate && measureTypeId.toString().isEmpty()){
+            Log.e(TAG,getResources().getString(R.string.updateErrorText));
+            //Toast.makeText(this, getResources().getString(R.string.updateErrorText), Toast.LENGTH_LONG).show();
+        }
+        return isValid;
     }
 }

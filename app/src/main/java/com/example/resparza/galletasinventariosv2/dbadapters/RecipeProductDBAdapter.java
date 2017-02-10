@@ -19,6 +19,7 @@ import java.util.List;
  * Created by resparza on 05/02/2016.
  */
 public class RecipeProductDBAdapter {
+    public static final String TAG = "RecipeProductDBAdapter";
     public static final String RECIPE_ID = "recipe_id";
     public static final String PRODUCT_ID = "product_id";
     public static final String PRODUCT_QUANTITY = "product_quantity";
@@ -70,6 +71,20 @@ public class RecipeProductDBAdapter {
     public boolean deleteRecipeProductByRecipeId(long recipeId) {
 
         return this.mDb.delete(RECIPE_PRODUCT_TABLE, RECIPE_ID + "=" + recipeId, null) > 0; //$NON-NLS-1$ //add both columns to where
+    }
+
+    public boolean deleteRecipeProductByRecipeIds(long recipeIds[]) {
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append(RECIPE_ID + " IN (");
+        for (int i = 0; i <= recipeIds.length- 1; i++) {
+            if (i < recipeIds.length - 1)
+                whereClause.append(recipeIds[i] + ",");
+            else
+                whereClause.append(recipeIds[i]);
+        }
+        whereClause.append(")");
+
+        return this.mDb.delete(RECIPE_PRODUCT_TABLE, whereClause.toString(), null) > 0; //$NON-NLS-1$ //add both columns to where
     }
 
     public boolean deleteRecipeProductByProductId(long productId) {
@@ -156,9 +171,8 @@ public class RecipeProductDBAdapter {
         initialValues.put(PRODUCT_QUANTITY, recipeProduct.getProductQuantity());
         initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
         initialValues.put(MEASUREMENT_TYPE_ID,recipeProduct.getMeasureTypeId());
-        if (isUpdate) {
+        if (!isUpdate) {
             initialValues.put(CREATED_ON, sdf.format(new Date(0)));
-        } else {
             initialValues.put(RECIPE_ID, recipeProduct.getRecipeId());
             initialValues.put(PRODUCT_ID, recipeProduct.getProductId());
         }

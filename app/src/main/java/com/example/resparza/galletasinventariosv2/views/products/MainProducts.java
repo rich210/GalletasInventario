@@ -50,7 +50,7 @@ public class MainProducts extends Fragment implements View.OnClickListener {
     private String mParam2;
 
     //
-    public static final String TAG = "ProductMainActivity";
+    public static final String TAG = "MainProducts";
     //Constants for intents
     public static final int REQUEST_CODE_ADD_PRODUCT = 10;
     public static final int REQUEST_CODE_MODIFY_PRODUCT = 20;
@@ -240,11 +240,11 @@ public class MainProducts extends Fragment implements View.OnClickListener {
                     }
                 }
                 if (productDBAdapter.deleteItemsByIds(ids)) {
-                    Toast.makeText(recyclerView.getContext(), "Deleted " +size +" types of measures", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(recyclerView.getContext(), "Deleted " +size +" products", Toast.LENGTH_SHORT).show();
                     adapter.notifyDataSetChanged();
                     onResume();
                 }else{
-                    Log.d(TAG, "Error trying to delete types of measures");
+                    Log.d(TAG, "Error trying to delete product");
                     Toast.makeText(recyclerView.getContext(), "Error", Toast.LENGTH_SHORT).show();
                 }
 

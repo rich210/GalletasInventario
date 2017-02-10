@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by resparza on 08/02/2016.
  */
-public class MeasureTypeDBAdapter {
+public class MeasureTypeDBAdapter implements DataSourceDBAdapter {
 
     public static final String TAG = "MeasureTypeDBAdapter";
 
@@ -56,10 +56,16 @@ public class MeasureTypeDBAdapter {
         this.mDbHelper.close();
     }
 
-    public long insertItem(MeasureType measureType) {
-        ContentValues initialValues = itemToValues(measureType, false);
+    public long insertItem(Object item) {
+        ContentValues initialValues = itemToValues(item, false);
         return this.mDb.insert(MEASURE_TABLE, null, initialValues);
     }
+    /*
+    public long insertItem(MeasureType item) {
+        ContentValues initialValues = itemToValues(item, false);
+        return this.mDb.insert(MEASURE_TABLE, null, initialValues);
+    }
+    */
 
     public boolean deleteItemById(long measureTypeId) {
 
@@ -88,7 +94,7 @@ public class MeasureTypeDBAdapter {
      *
      * @return Cursor over all cars
      */
-    public List<MeasureType> getAllItems() {
+    public List getAllItems() {
         List<MeasureType> measureTypes = new ArrayList<MeasureType>();
         String selectQuery = "SELECT  * FROM " + MEASURE_TABLE;
 
@@ -121,9 +127,9 @@ public class MeasureTypeDBAdapter {
         return measureType;
     }
 
-    public boolean updateItem(MeasureType measureType) {
-
-        ContentValues values = itemToValues(measureType, true);
+    public boolean updateItem(Object item) {
+        MeasureType measureType = (MeasureType)item;
+        ContentValues values = itemToValues(item, true);
         return this.mDb.update(MEASURE_TABLE, values, MEASURE_TYPE_ID + "=" + measureType.getMeasureTypeId(), null) >0;
     }
 
@@ -141,7 +147,8 @@ public class MeasureTypeDBAdapter {
 
     }
 
-    private ContentValues itemToValues(MeasureType measureType, boolean isUpdate) {
+    private ContentValues itemToValues(Object item, boolean isUpdate) {
+        MeasureType measureType = (MeasureType)item;
         ContentValues values = new ContentValues();
         values.put(MEASURE_NAME, measureType.getMeasureTypeName());
         values.put(MEASURE_SYMBOL, measureType.getMeasureSymbol());
@@ -176,6 +183,21 @@ public class MeasureTypeDBAdapter {
 
         //Log.e(LOG, selectQuery);
 
+        Cursor c = this.mDb.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                MeasureType measureType = cursorToItem(c);
+                measureTypes.add(measureType);
+            } while (c.moveToNext());
+        }
+        return measureTypes;
+    }
+
+    public List<MeasureType> getAllMeasureTypesByMeasureBase(Long id){
+        List<MeasureType> measureTypes = new ArrayList<MeasureType>();
+        String selectQuery = "SELECT  * FROM " + MEASURE_TABLE + " WHERE " + MEASURE_EQUIVALENCY_ID + " = " + id + " OR " + MEASURE_TYPE_ID + " = " + id;
         Cursor c = this.mDb.rawQuery(selectQuery, null);
 
         // looping through all rows and adding to list

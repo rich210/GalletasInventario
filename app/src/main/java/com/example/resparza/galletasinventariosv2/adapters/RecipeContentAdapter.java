@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.models.Recipe;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -57,9 +59,19 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Recipe recipe = lItems.get(position);
-        holder.imageRecipe.setImageDrawable(mRecipePictures[1]);
+
+        //holder.imageRecipe.setImageDrawable(mRecipePictures[1]);
+        if(recipe == null){
+            Log.d(TAG, recipe.toString());
+        }
+        if(recipe.getRecipeImagePath() != null && !recipe.getRecipeImagePath().isEmpty() ){
+            holder.imageRecipe.setImageURI(Uri.fromFile(new File(recipe.getRecipeImagePath())));
+        }else{
+            holder.imageRecipe.setVisibility(View.GONE);
+        }
+
         holder.recipeName.setText(recipe.getRecipeName());
-        holder.costPerUnit.setText(String.valueOf(recipe.getRecipeCost()));
+        holder.recipeCost.setText(String.valueOf(recipe.getRecipeCost(context)));
         //holder.recipeName.setText(recipeNames[position % recipeNames.length]);
         holder.recipeCardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -75,7 +87,6 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
 
                 }
                 displayFloatingActionButtons();
-                //Log.d(TAG,product.getInfo());
             }
         });
     }
@@ -127,14 +138,14 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
        public ImageView imageRecipe;
         public TextView recipeName;
         public TextView products;
-        public TextView costPerUnit;
+        public TextView recipeCost;
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_recipe, parent, false));
             recipeCardView = (CardView)itemView.findViewById(R.id.RecipeCardView);
             imageRecipe = (ImageView) itemView.findViewById(R.id.ivRecipeImage);
             recipeName = (TextView) itemView.findViewById(R.id.txtRecipeName);
             products = (TextView)itemView.findViewById(R.id.txtProducts);
-            costPerUnit = (TextView)itemView.findViewById(R.id.txtCostPerUnit);
+            recipeCost = (TextView)itemView.findViewById(R.id.txtRecipeCost);
         }
     }
 

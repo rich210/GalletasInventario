@@ -3,7 +3,7 @@ package com.example.resparza.galletasinventariosv2.models;
 /**
  * Created by resparza on 27/01/2016.
  */
-public class MeasureType {
+public class MeasureType extends Object {
 
     private long measureTypeId;
     private String measureTypeName;
