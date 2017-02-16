@@ -28,10 +28,11 @@ public class RecipeDBAdapter {
     public static final String RECIPE_NAME = "recipe_name";
     //public static final String MEASURE_TYPE_ID = "measure_type_id";
     public static final String QUANTITY = "quantity";
-    public static final String RECIPE_COST = "recipe_cost";
+    public static final String RECIPE_COST = "recipe_cost"; //TODO: Delete recipe cost column it will be generated
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";
     public static final String IMAGE_PATH = "image_path";
+    public static final String RECIPE_INSTRUCTIONS = "recipe_instructions"; //TODO: Add recipe instruction to database
 
     public static final String RECIPE_TABLE = "tbl_recipes";
     private final Context mCtx;
@@ -58,10 +59,10 @@ public class RecipeDBAdapter {
         return this.mDb.insert(RECIPE_TABLE, null, initialValues);
     }
 
-    public long insertItem(Context context, Recipe recipe, List<RecipeProduct> recipeProductList) throws SQLException {
+    public long insertItem(Recipe recipe, List<RecipeProduct> recipeProductList) throws SQLException {
         ContentValues initialValues = itemToValues(recipe, false);
         long recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
-        RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(context);
+        RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
         recipeProductDBAdapter.open();
         for (RecipeProduct recipeProduct: recipeProductList) {
             recipeProduct.setRecipeId(recipeId);
@@ -147,10 +148,26 @@ public class RecipeDBAdapter {
         return recipe;
     }
 
-    public boolean updateItem(Recipe recipe) {
+    public boolean updateItem(Recipe recipe, List<RecipeProduct> recipeProducts) throws SQLException {
 
         ContentValues values = itemToValues(recipe, true);
-        return this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
+        boolean isRecipeUpdated = this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
+        if (isRecipeUpdated){
+            RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
+            recipeProductDBAdapter.open();
+            for (RecipeProduct recipeProduct: recipeProducts) {
+                isRecipeUpdated = recipeProductDBAdapter.updateItem(recipeProduct);
+                if (!isRecipeUpdated){
+                    Log.e(TAG,"Error trying to insert recipe product");
+                    break;
+                }
+            }
+            recipeProductDBAdapter.close();
+        }else {
+            Log.e(TAG, "updateItem: Error updating recipe");
+        }
+
+        return isRecipeUpdated;
     }
 
     private Recipe cursorToItem(Cursor cursor) {
@@ -161,15 +178,7 @@ public class RecipeDBAdapter {
         recipe.setMeasureTypeQuantity(cursor.getInt(cursor.getColumnIndex(QUANTITY)));
         recipe.setRecipeCost(cursor.getFloat(cursor.getColumnIndex(RECIPE_COST)));
         recipe.setRecipeImagePath(cursor.getString(cursor.getColumnIndex(IMAGE_PATH)));
-        /*long measureTypeId = cursor.getLong(cursor.getColumnIndex(MEASURE_TYPE_ID));
-        MeasureTypeDBAdapter measureTypeDBAdapter = new MeasureTypeDBAdapter(mCtx);
-        try {
-            MeasureType measureType = measureTypeDBAdapter.getItemById(measureTypeId);
-            if (measureType != null)
-                recipe.setMeasureType(measureType);
-        } catch (SQLException e) {
-            Log.d(TAG, "Error trying to retrieve measure type for : " + recipe.getRecipeName() + " " + recipe.getRecipeId());
-        }*/
+        //recipe.setRecipeInstructions(cursor.getString(cursor.getColumnIndex(RECIPE_INSTRUCTIONS)));
         try {
             recipeProductDBAdapter.open();
             List<RecipeProduct> recipeProducts = recipeProductDBAdapter.getAllItemsByRecipeId(recipe.getRecipeId());
@@ -190,7 +199,7 @@ public class RecipeDBAdapter {
         values.put(RECIPE_NAME, recipe.getRecipeName());
         //values.put(MEASURE_TYPE_ID, recipe.getMeasureType().getMeasureTypeId());
         values.put(QUANTITY, recipe.getMeasureTypeQuantity());
-        values.put(RECIPE_COST, recipe.getRecipeCost(mCtx));
+        //values.put(RECIPE_COST, recipe.getRecipeCost(mCtx));
         values.put(IMAGE_PATH,recipe.getRecipeImagePath());
 
         values.put(UPDATED_ON, sdf.format(new Date(0)));

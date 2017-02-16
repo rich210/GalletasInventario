@@ -89,6 +89,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     private String mCurrentPhotoPath;
     private boolean isUpdate;
     private Bitmap recipeImage;
+    private String recipeImagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,18 +101,17 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         recipeImage = null;
         initView();
         Intent intent = getIntent();
-        String tittle;
+        String tittle = getResources().getString(R.string.recipeFormAddTitle);
 
         isUpdate = intent.getExtras().getBoolean(MainRecipes.IS_UPDATE);
         if (isUpdate) {
-            //long id = intent.getExtras().getLong(MeasureTypeMainActivity.EXTRA_SELECTED_MEASURE_ID);
-            //if (id != 0) {
-            //loadMeasureType(id);
-            tittle = getResources().getString(R.string.recipeFormUpdateTitle);
-
-            //}
-        } else {
-            tittle = getResources().getString(R.string.recipeFormAddTitle);
+            long id = intent.getExtras().getLong(MainRecipes.EXTRA_SELECTED_RECIPE_ID);
+            if (id != 0) {
+                loadData(id);
+                tittle = getResources().getString(R.string.recipeFormUpdateTitle);
+            }
+        }else{
+            addProductForm(null);
         }
         setTitle(tittle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -171,7 +171,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         this.btnTakePicture.setOnClickListener(this);
         this.ibAddProduct.setOnClickListener(this);
 
-        addProductForm();
+
 
     }
 
@@ -182,7 +182,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                 //break;
             case R.id.btnAddProduct:
                 Log.d(TAG, "Add button clicked");
-                addProductForm();
+                addProductForm(null);
                 break;
             case R.id.saveRecipeButton:
                 saveRecipe();
@@ -201,13 +201,14 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     /**
      * Add layouts for products
      */
-    public void addProductForm() {
+    public void addProductForm(final RecipeProduct recipeProduct) {
         if (numberOfLinearLayout <= 19) {
 
             LinearLayout.LayoutParams llProductParamas = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
             LinearLayout llProductContainer = new LinearLayout(this);
             LinearLayout llProductQuantity = new LinearLayout(this);
             Spinner spinnerProduct = new Spinner(this);
+            SpinnerProductAdapter productAdapter = getProducts();
             Spinner spinnerMeasureSymbol = new Spinner(this);
             EditText etProductQuantity = new EditText(this);
             //TextView tvMeasureSymbol = new TextView(this);
@@ -217,6 +218,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     long equivalencyId = 0;
                     Product product = (Product) parent.getItemAtPosition(position);
+                    SpinnerMeasureTypesAdapter measureTypeAdapter;
                     ViewGroup container = (ViewGroup)parent.getParent();
                     ViewGroup linearLayoutContainer = (ViewGroup)container.getChildAt(1);
                     Spinner spinnerMeasureSymbol = (Spinner) linearLayoutContainer.getChildAt(1);
@@ -226,7 +228,11 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                         if(equivalencyId ==0){
                             equivalencyId = product.getMeasureType().getMeasureTypeId();
                         }
-                        spinnerMeasureSymbol.setAdapter(getMeasureTpes(equivalencyId));
+                        measureTypeAdapter = getMeasureTpes(equivalencyId);
+                        spinnerMeasureSymbol.setAdapter(measureTypeAdapter);
+                        if(recipeProduct != null){
+                            spinnerMeasureSymbol.setSelection(measureTypeAdapter.getPositionById(recipeProduct.getMeasureTypeId()));
+                        }
                     }
                 }
                 @Override
@@ -234,24 +240,18 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
 
                 }
             });
-
-
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             layoutParams.setMargins(50, 0, 50, 0);
             spinnerProduct.setLayoutParams(layoutParams);
-            spinnerProduct.setAdapter(getProducts());
-
+            spinnerProduct.setAdapter(productAdapter);
             etProductQuantity.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.5f));
             etProductQuantity.setHint(R.string.recipeFormQuantity);
             etProductQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            spinnerMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
-            /*if (Build.VERSION.SDK_INT < 23) {
-                tvMeasureSymbol.setTextAppearance(this, R.style.RecipeFormTextViewMeasurementSymbol);
-            } else {
-                tvMeasureSymbol.setTextAppearance(R.style.RecipeFormTextViewMeasurementSymbol);
+            if(recipeProduct != null){
+                spinnerProduct.setSelection(productAdapter.getPositionById(recipeProduct.getProductId()));
+                etProductQuantity.setText(String.valueOf(recipeProduct.getProductQuantity()));
             }
-            tvMeasureSymbol.setTextSize(15);
-            tvMeasureSymbol.setPadding(0,10,0,0);*/
+            spinnerMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
             ibRemoveProduct.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
             ibRemoveProduct.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_minus));
             ibRemoveProduct.setOnClickListener(this);
@@ -412,8 +412,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     }
 
     private void saveRecipe(){
-        this.bSaveRecipe.setVisibility(View.GONE);
-        this.progressBar.setVisibility(View.VISIBLE);
+        RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(this);
         Boolean isProductValid = true;
         Editable recipeName = etRecipeName.getText();
         Editable portions = etRecipePortions.getText();
@@ -421,13 +420,14 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
         Recipe recipe = new Recipe();
         List<RecipeProduct> recipeProducts = new ArrayList<RecipeProduct>();
 
-        if (!TextUtils.isEmpty(recipeName) && !TextUtils.isEmpty(portions)){
+        this.bSaveRecipe.setVisibility(View.GONE);
+        this.progressBar.setVisibility(View.VISIBLE);
+
+        if (isValid(recipeName,portions)){
             for (LinearLayout ll:linearLayoutArray) {
                 Spinner spinner = (Spinner)ll.getChildAt(0);
                 ViewGroup linearLayoutContainer = (ViewGroup)ll.getChildAt(1);
                 EditText etQuantity = (EditText) linearLayoutContainer.getChildAt(0);
-//                TextView tvMeasureSymbol = (TextView) linearLayoutContainer.getChildAt(1);
-
                 Editable quantity = etQuantity.getText();
                 Product product = (Product) spinner.getSelectedItem();
                 if (TextUtils.isEmpty(quantity) || product.getProductId()<1)
@@ -435,6 +435,9 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                     isProductValid = false;
                 }
                 RecipeProduct recipeProduct = new RecipeProduct(product.getProductId(), product.getMeasureType().getMeasureTypeId(), Float.valueOf(quantity.toString()));
+                if(isUpdate){
+                    recipeProduct.setRecipeId(Long.valueOf( this.tvRecipeId.getText().toString()));
+                }
                 recipeProducts.add(recipeProduct);
             }
             if (recipeImage != null){
@@ -444,43 +447,87 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                     e.printStackTrace();
                     Log.e(TAG,"Error trying to save image");
                 }
+            }else if(recipeImagePath != null){
+                recipe.setRecipeImagePath(recipeImagePath);
             }
             recipe.setRecipeName(recipeName.toString());
             recipe.setQuantity(Integer.valueOf(portions.toString()));
 
             if (isProductValid){
-                if(!isUpdate){
-                    RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(this);
+
                     try {
                         recipeDBAdapter.open();
-                        recipe.setRecipeId(recipeDBAdapter.insertItem(this,recipe,recipeProducts)); ;
-                        if (recipe.getRecipeId()>0){
-                            Log.d(TAG, "added recipe : " + recipe.getRecipeId() + " " + recipe.getRecipeName());
-                            setResult(RESULT_OK);
-                            recipeDBAdapter.close();
-                            finish();
+                        if(!isUpdate){
+                            recipe.setRecipeId(recipeDBAdapter.insertItem(recipe,recipeProducts)); ;
+                            if (recipe.getRecipeId()>0){
+                                Log.d(TAG, "added recipe : " + recipe.getRecipeId() + " " + recipe.getRecipeName());
+                                setResult(RESULT_OK);
+                                recipeDBAdapter.close();
+                                finish();
+                            }
+                        }else{
+                            recipe.setRecipeId(Long.valueOf(this.tvRecipeId.getText().toString()));
+                            if(recipeDBAdapter.updateItem(recipe,recipeProducts)){
+                                Log.d(TAG, "modified recipe : " + recipe.getRecipeId() + " " + recipe.getRecipeName());
+                                setResult(RESULT_OK);
+                                recipeDBAdapter.close();
+                                finish();
+                            }
                         }
-
                     } catch (SQLException e) {
                         e.printStackTrace();
                         Log.d(TAG,"Error trying to insert recipe"+ e.getMessage());
                     }finally {
                         recipeDBAdapter.close();
                     }
-                }else{
-
-                }
             }else{
-                Toast.makeText(this,R.string.errorRecipeForm,Toast.LENGTH_SHORT);
+                Toast.makeText(this,R.string.errorRecipeProductsForm,Toast.LENGTH_SHORT);
                 this.bSaveRecipe.setVisibility(View.VISIBLE);
                 this.progressBar.setVisibility(View.GONE);
             }
+        }else{
+            Toast.makeText(this,R.string.errorRecipeForm,Toast.LENGTH_SHORT);
+            this.bSaveRecipe.setVisibility(View.VISIBLE);
+            this.progressBar.setVisibility(View.GONE);
         }
     }
 
-    private boolean isValid(){
+    private boolean isValid(Editable recipeName, Editable portions){
         boolean isValid = true;
+        if (recipeName.toString().isEmpty()){
+            this.etRecipeName.setError(etRecipeName.getHint()+" "+ getResources().getString(R.string.requiredErrorText));
+            isValid = false;
+        }
+        if (portions.toString().isEmpty()){
+            this.etRecipePortions.setError(etRecipePortions.getHint()+" "+ getResources().getString(R.string.requiredErrorText));
+            isValid = false;
+        }
         return isValid;
+    }
+
+    private void loadData(long id){
+        RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(this);
+        Recipe recipe;
+        try {
+            recipeDBAdapter.open();
+            recipe = recipeDBAdapter.getItemById(id);
+            recipeDBAdapter.close();
+            this.tvRecipeId.setText(String.valueOf(recipe.getRecipeId()));
+            this.etRecipeName.setText(recipe.getRecipeName());
+            this.etRecipePortions.setText(String.valueOf(recipe.getQuantity()));
+            this.etRecipeInstructions.setText(recipe.getRecipeInstructions());
+            if(recipe.getRecipeImagePath() != null){
+                this.ivRecipeImage.setImageURI(Uri.fromFile(new File(recipe.getRecipeImagePath())));
+                this.recipeImagePath = recipe.getRecipeImagePath();
+            }
+            for (RecipeProduct recipeProduct: recipe.getRecipeProducts()) {
+                addProductForm(recipeProduct);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error retrieving recipe");
+        }
+
     }
 
 }

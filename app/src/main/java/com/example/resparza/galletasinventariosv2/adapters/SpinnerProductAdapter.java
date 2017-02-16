@@ -78,8 +78,8 @@ public class SpinnerProductAdapter extends BaseAdapter {
 
     public Product getItemById(long id) {
         for (int i = 0; i <= mItems.size(); i++) {
-            long measureTypeId = getItemId(i);
-            if (measureTypeId == id) {
+            long itemId = getItemId(i);
+            if (itemId == id) {
                 return getItem(i);
             }
         }
@@ -88,8 +88,8 @@ public class SpinnerProductAdapter extends BaseAdapter {
 
     public int getPositionById(long id) {
         for (int i = 0; i <= mItems.size(); i++) {
-            long measureTypeId = getItemId(i);
-            if (measureTypeId == id) {
+            long itemId = getItemId(i);
+            if (itemId == id) {
                 return i;
             }
         }

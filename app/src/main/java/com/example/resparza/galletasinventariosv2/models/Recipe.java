@@ -20,6 +20,7 @@ public class Recipe {
     private MeasureType measureType;
     private float recipeCost;
     private String recipeImagePath;
+    private String recipeInstructions;
 
     public Recipe() {
     }
@@ -126,5 +127,13 @@ public class Recipe {
 
     public void setRecipeImagePath(String recipeImagePath) {
         this.recipeImagePath = recipeImagePath;
+    }
+
+    public String getRecipeInstructions() {
+        return recipeInstructions;
+    }
+
+    public void setRecipeInstructions(String recipeInstructions) {
+        this.recipeInstructions = recipeInstructions;
     }
 }

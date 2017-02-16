@@ -29,6 +29,9 @@
     <!-- Recipe Form Text  -->
     <string name="recipeFormAddTitle">Añadir receta</string>
     <string name="recipeFormUpdateTitle">Modificar receta</string>
+    <string name="errorRecipeProductsForm">Los productos no son validos</string>
+    <string name="errorRecipeForm">Porfavor verifique que todo los datos esten correctos.</string>
+    <string name="recipeFormQuantity">Cantidad</string>
 
     <!-- Order Form Text  -->
     <string name="ordenFormAddTitle">Añadir orden</string>
@@ -42,6 +45,6 @@
     <string name="cancel">Cancelar</string>
     <string name="chooseOption">Elegir Opciòn</string>
 
-    <string name="errorRecipeForm">Los productos no son validos</string>
-    <string name="recipeFormQuantity">Cantidad</string>
+
+
 </resources>

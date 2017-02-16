@@ -19,7 +19,7 @@ public class DBAdapter {
     public static final String DATABASE_NAME = "cookieManager"; //$NON-NLS-1$
     public static final String TAG = "DBAdapter";
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 3; //TODO: Update database to insert column in recipe table
 
 
     private static final String CREATE_TABLE_TBL_PRODUCTS =
@@ -39,6 +39,7 @@ public class DBAdapter {
                     + RecipeDBAdapter.RECIPE_ID + " integer primary key autoincrement, " //$NON-NLS-1$
                     + RecipeDBAdapter.RECIPE_NAME +" TEXT," //$NON-NLS-1$
                     //+ RecipeDBAdapter.MEASURE_TYPE_ID + " INTEGER," //$NON-NLS-1$
+                    + RecipeDBAdapter.RECIPE_INSTRUCTIONS + " TEXT,"
                     + RecipeDBAdapter.QUANTITY +" INTEGER," //$NON-NLS-1$
                     + RecipeDBAdapter.RECIPE_COST +" REAL," //$NON-NLS-1$
                     + RecipeDBAdapter.CREATED_ON +" TEXT," //$NON-NLS-1$
