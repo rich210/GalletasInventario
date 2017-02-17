@@ -3,11 +3,14 @@ package com.example.resparza.galletasinventariosv2.views.orders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,12 @@ import android.widget.TextView;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
+import com.example.resparza.galletasinventariosv2.adapters.OrderContentAdapter;
+import com.example.resparza.galletasinventariosv2.dbadapters.OrderDBAdapter;
+import com.example.resparza.galletasinventariosv2.models.Order;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /*
  * A simple {@link Fragment} subclass.
@@ -46,6 +55,8 @@ public class MainOrders extends Fragment implements View.OnClickListener {
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
     private FloatingActionButton efab;
+
+    private RecyclerView recyclerView;
 
 
     public MainOrders() {
@@ -83,67 +94,20 @@ public class MainOrders extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
+        recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
-        ContentAdapter adapter = new ContentAdapter(recyclerView.getContext());
+        List<Order> recipes = getOrders();
+        if (recipes == null || recipes.isEmpty()){
+            Intent intent = new Intent(getActivity(), FormOrder.class);
+            intent.putExtra(IS_UPDATE,false);
+            startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
+        }
+        OrderContentAdapter adapter = new OrderContentAdapter(recyclerView.getContext(),recipes);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        //recyclerView.setBackgroundResource(R.color.colorSecondary);
-
         initFloatingActionButtons();
         return recyclerView;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public CheckedTextView orderClientName;
-        public TextView orderNumber;
-        public TextView orderDeliveryDate;
-        public TextView orderState;
-        public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.list_item_order, parent, false));
-            orderClientName = (CheckedTextView) itemView.findViewById(R.id.txtClientName);
-            orderNumber = (TextView)itemView.findViewById(R.id.txtOrderNo);
-            orderDeliveryDate = (TextView)itemView.findViewById(R.id.txtDeliveryDate);
-            orderState = (TextView)itemView.findViewById(R.id.txtOrderState);
-        }
-    }
-
-    public static class ContentAdapter extends RecyclerView.Adapter<ViewHolder> {
-        // Set numbers of List in RecyclerView.
-        private static final int LENGTH = 18;
-        private final String[] orderNumbers;
-        private final String[] orderClientNames;
-        private final String[] orderDeliveryDates;
-        private final String[] orderStates;
-
-
-        public ContentAdapter(Context context) {
-            Resources resources = context.getResources();
-            orderNumbers = resources.getStringArray(R.array.orderNumber);
-            orderClientNames = resources.getStringArray(R.array.ordersClientNames);
-            orderDeliveryDates = resources.getStringArray(R.array.orderDeliveryDate);
-            orderStates = resources.getStringArray(R.array.orderStates);
-
-        }
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext()), parent);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.orderNumber.setText(orderNumbers[position % orderNumbers.length]);
-            holder.orderClientName.setText(orderClientNames[position % orderClientNames.length]);
-            holder.orderDeliveryDate.setText(orderDeliveryDates[position % orderDeliveryDates.length]);
-            holder.orderState.setText(orderStates[position % orderStates.length]);
-        }
-
-        @Override
-        public int getItemCount() {
-            return LENGTH;
-        }
     }
 
     private void initFloatingActionButtons(){
@@ -152,14 +116,15 @@ public class MainOrders extends Fragment implements View.OnClickListener {
         afab.setOnClickListener(this);
         dfab = ((MainActivity)getActivity()).getDeleteFAB();
         dfab.setVisibility(View.GONE);
+        dfab.setOnClickListener(this);
         efab = ((MainActivity)getActivity()).getEditFAB();
-        efab.setVisibility(View.VISIBLE);
+        efab.setVisibility(View.GONE);
         efab.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        //SparseBooleanArray selected;
+        SparseBooleanArray selected;
         Intent intent;
         Long selectedId;
         short size;
@@ -207,6 +172,24 @@ public class MainOrders extends Fragment implements View.OnClickListener {
             default:
                 break;
         }
+    }
+
+    private List<Order> getOrders(){
+        List<Order> orders = null;
+        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
+        try {
+            orderDBAdapter.open();
+            orders = orderDBAdapter.getAllItems();
+        }catch (SQLiteException e){
+            Log.e(TAG, "Error:"+ e.getMessage());
+            //Add ui if list is empty
+        } catch (SQLException e) {
+            Log.e(TAG, "Error:"+ e.getMessage());
+        }finally {
+            orderDBAdapter.close();
+        }
+
+        return orders;
     }
 
 }

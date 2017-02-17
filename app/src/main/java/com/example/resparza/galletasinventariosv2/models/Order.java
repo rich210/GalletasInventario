@@ -16,6 +16,7 @@ public class Order {
     private float total;
     private float sellPrice;
     private float gain;
+    private String orderStatus;
 
     public Order() {
     }
@@ -109,5 +110,13 @@ public class Order {
 
     public void setGain(float gain) {
         this.gain = gain;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }

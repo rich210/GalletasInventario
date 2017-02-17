@@ -41,7 +41,7 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
         this.lItems = recipes;
         this.mSelectedItemsIds = new SparseBooleanArray();
         this.context= context;
-
+        //TODO: Deleted this part of the code and testes, it should do anything anymore
         Resources resources = context.getResources();
         TypedArray a = resources.obtainTypedArray(R.array.recipes_pictures);
         mRecipePictures = new Drawable[a.length()];

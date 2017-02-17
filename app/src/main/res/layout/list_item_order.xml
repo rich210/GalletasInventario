@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView android:id="@+id/OrderCardView"
+<android.support.v7.widget.CardView
+    android:id="@+id/OrderCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardCornerRadius="16dp"
@@ -30,7 +31,7 @@
             android:layout_marginTop="2dp"
             android:layout_alignParentLeft="true"
             android:background="@drawable/primary_round_corner"/>
-        <CheckedTextView
+        <TextView
             android:id="@+id/txtClientName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

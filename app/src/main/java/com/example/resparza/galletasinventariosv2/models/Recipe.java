@@ -41,6 +41,17 @@ public class Recipe {
         this.recipeProducts = recipeProducts;
     }
 
+    public Recipe(long recipeId, String recipeName, int quantity, List<RecipeProduct> recipeProducts, MeasureType measureType, float recipeCost, String recipeImagePath, String recipeInstructions) {
+        this.recipeId = recipeId;
+        this.recipeName = recipeName;
+        this.quantity = quantity;
+        this.recipeProducts = recipeProducts;
+        this.measureType = measureType;
+        this.recipeCost = recipeCost;
+        this.recipeImagePath = recipeImagePath;
+        this.recipeInstructions = recipeInstructions;
+    }
+
     public long getRecipeId() {
         return recipeId;
     }
@@ -135,5 +146,19 @@ public class Recipe {
 
     public void setRecipeInstructions(String recipeInstructions) {
         this.recipeInstructions = recipeInstructions;
+    }
+
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "recipeId=" + recipeId +
+                ", recipeName='" + recipeName + '\'' +
+                ", quantity=" + quantity +
+                ", recipeProducts=" + recipeProducts +
+                ", measureType=" + measureType +
+                ", recipeCost=" + recipeCost +
+                ", recipeImagePath='" + recipeImagePath + '\'' +
+                ", recipeInstructions='" + recipeInstructions + '\'' +
+                '}';
     }
 }
