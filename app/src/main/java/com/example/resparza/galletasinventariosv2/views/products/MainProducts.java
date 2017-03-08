@@ -117,7 +117,7 @@ public class MainProducts extends Fragment implements View.OnClickListener {
             startActivityForResult(intent, REQUEST_CODE_ADD_PRODUCT);
         }
 
-        adapter = new ProductContentAdapter(recyclerView.getContext(),products);
+        adapter = new ProductContentAdapter(recyclerView.getContext(),products, true);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -206,7 +206,7 @@ public class MainProducts extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         List<Product> products = getProducts(recyclerView.getContext());
-        adapter = new ProductContentAdapter(recyclerView.getContext(),products);
+        adapter = new ProductContentAdapter(recyclerView.getContext(),products, true);
         adapter.clearSelectedIds();
         adapter.displayFloatingActionButtons();
         recyclerView.setAdapter(adapter);

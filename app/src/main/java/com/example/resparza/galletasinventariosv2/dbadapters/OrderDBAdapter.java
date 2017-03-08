@@ -5,14 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 import com.example.resparza.galletasinventariosv2.models.Order;
+import com.example.resparza.galletasinventariosv2.models.OrderRecipe;
 
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -20,6 +23,8 @@ import java.util.List;
  * Created by resparza on 05/02/2016.
  */
 public class OrderDBAdapter {
+    public static final String TAG = "OrderDBAdapter";
+
     public static final String ORDER_ID = "order_id";
     public static final String ORDER_NAME = "order_name";
     public static final String CLIENT_NAME = "client_name";
@@ -27,6 +32,7 @@ public class OrderDBAdapter {
     public static final String DELIVERY_DATE = "delivery_date";
     public static final String TOTAL = "total";
     public static final String SELL_PRICE = "sell_price";
+    public static final String ORDER_STATUS = "order_status";
     //public static final String GAIN = "gain";
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";
@@ -52,8 +58,32 @@ public class OrderDBAdapter {
     }
 
     public long insertItem(Order order) {
+        long orderId = 0;
+
+        OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         ContentValues initialValues = itemToValues(order, false);
-        return this.mDb.insert(ORDER_TABLE, null, initialValues);
+        this.mDb.beginTransaction();
+        try{
+            orderId = this.mDb.insert(ORDER_TABLE, null, initialValues);
+            if(orderId>0){
+                for (OrderRecipe orderRecipe: order.getOrderRecipes()) {
+                    orderRecipe.setOrderId(orderId);
+                    if(orderRecipeDBAdapter.insertItem(orderRecipe, this.mDb)<1){
+                        orderId=0;
+                        Log.e(TAG,"Error trying to insert order recipe");
+                        throw new RuntimeException("Order Recipe was not updated correctly");
+                    }
+                }
+                this.mDb.setTransactionSuccessful();
+            }
+        }
+        catch (Exception e){
+
+        }
+        finally {
+            this.mDb.endTransaction();
+            return orderId;
+        }
     }
 
     public boolean deleteItemById(long orderId) {
@@ -97,6 +127,31 @@ public class OrderDBAdapter {
         return orders;
     }
 
+    public List<Order> getAllItemsByDate(Date date) {
+        List<Order> orders = new ArrayList<Order>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        String firstDayOfMonth = sdf.format(calendar.getTime());
+        calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        String lastDayOfMonth = sdf.format(calendar.getTime());
+        Log.d(TAG, "getAllItemsByDate: FistDay " + firstDayOfMonth + " Last daay "+ lastDayOfMonth);
+        String selectQuery = "SELECT  * FROM " + ORDER_TABLE +" WHERE "+ DELIVERY_DATE +" BETWEEN '" + firstDayOfMonth +"' and '"+ lastDayOfMonth +"'";
+        Log.d(TAG, "getAllItemsByDate: "+selectQuery);
+
+        //Log.e(LOG, selectQuery);
+
+        Cursor c = this.mDb.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Order order = cursorToItem(c);
+                orders.add(order);
+            } while (c.moveToNext());
+        }
+        return orders;
+    }
+
     public Order getItemById(long orderId) throws SQLException {
 
         String selectQuery = "SELECT  * FROM " + ORDER_TABLE + " WHERE "
@@ -112,10 +167,39 @@ public class OrderDBAdapter {
     }
 
     public boolean updateItem(Order order) {
-
+        boolean isOrderUpdated =true;
+        OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         ContentValues values = itemToValues(order, true);
-
-        return this.mDb.update(ORDER_TABLE, values, ORDER_ID + "=" + order.getOrderId(), null) > 0;
+        Log.d(TAG, "updateItem: "+values.toString());
+        Log.d(TAG, "updateItem: "+ order.toString());
+        this.mDb.beginTransaction();
+        try{
+            isOrderUpdated = this.mDb.update(ORDER_TABLE, values, ORDER_ID + "=" + order.getOrderId(), null) > 0;
+            if(isOrderUpdated){
+                try {
+                    for (OrderRecipe orderRecipe: order.getOrderRecipes()) {
+                        if(!orderRecipeDBAdapter.updateItem(orderRecipe, this.mDb)){
+                            isOrderUpdated = false;
+                            throw new RuntimeException("Error updating order recipe");
+                        }
+                    }
+                    this.mDb.setTransactionSuccessful();
+                } catch (Exception e) {
+                    isOrderUpdated = false;
+                    Log.e(TAG, "updateItem: Eror",e );
+                }
+            }else{
+                Log.d(TAG, "updateItem: The order was not updated correctly");
+            }
+        }
+        catch (Exception e){
+            isOrderUpdated = false;
+            Log.e(TAG, "updateItem: Error",e );
+        }
+        finally {
+            this.mDb.endTransaction();
+            return isOrderUpdated;
+        }
     }
 
     private ContentValues itemToValues(Order order, boolean isUpdate) {
@@ -124,7 +208,7 @@ public class OrderDBAdapter {
         initialValues.put(CLIENT_NAME, order.getClientName());
         initialValues.put(CLIENT_NUMBER, order.getClientNumber());
         initialValues.put(DELIVERY_DATE, sdf.format(order.getDeliveryDate()));
-        //initialValues.put(GAIN, order.getGain());
+        initialValues.put(ORDER_STATUS,order.getOrderStatus());
         initialValues.put(TOTAL, order.getTotal());
         initialValues.put(SELL_PRICE, order.getSellPrice());
         initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
@@ -135,7 +219,7 @@ public class OrderDBAdapter {
     }
 
     private Order cursorToItem(Cursor c) {
-
+        OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         Order order = new Order();
         order.setOrderId(c.getInt(c.getColumnIndex(ORDER_ID)));
         order.setOrderName(c.getString(c.getColumnIndex(ORDER_NAME)));
@@ -148,6 +232,15 @@ public class OrderDBAdapter {
         }
         order.setTotal(c.getFloat(c.getColumnIndex(TOTAL)));
         order.setSellPrice(c.getFloat(c.getColumnIndex(SELL_PRICE)));
+        order.setOrderStatus(c.getString(c.getColumnIndex(ORDER_STATUS)));
+        try {
+            orderRecipeDBAdapter.open();
+            List<OrderRecipe> orderRecipes = orderRecipeDBAdapter.getItemsByOrderId(order.getOrderId());
+            order.setOrderRecipes(orderRecipes);
+            orderRecipeDBAdapter.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return order;
 
     }

@@ -1,6 +1,8 @@
 package com.example.resparza.galletasinventariosv2.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,8 @@ import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.models.Order;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 /**
@@ -27,7 +31,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
     private SparseBooleanArray mSelectedItemsIds;
     private Context context;
     //private Drawable[] mRecipePictures;
-    public static final String TAG = "ProductContentAdapter";
+    public static final String TAG = "OrderContentAdapter";
 
 
     public OrderContentAdapter(Context context, List<Order> orders) {
@@ -50,11 +54,6 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
         if(order == null){
         Log.d(TAG, order.toString());
         }
-        /*if(recipe.getRecipeImagePath() != null && !recipe.getRecipeImagePath().isEmpty() ){
-        holder.imageRecipe.setImageURI(Uri.fromFile(new File(recipe.getRecipeImagePath())));
-        }else{
-        holder.imageRecipe.setVisibility(View.GONE);
-        }*/
 
         holder.tvOrderNO.setText(String.valueOf(order.getOrderId()));
         if(order.getClientName() != null){
@@ -62,13 +61,40 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
         }else{
             holder.tvClientName.setText(order.getOrderName());
         }
-        holder.tvDeliveryDate.setText(String.valueOf(order.getDeliveryDate()));
+        holder.tvDeliveryDate.setText(order.getFormatedDelivaryDate());
         holder.tvOrderState.setText(order.getOrderStatus());
-        //holder.recipeName.setText(recipeNames[position % recipeNames.length]);
+        holder.tvOrderState.setBackgroundResource(R.drawable.background_round_corner);
+        GradientDrawable drawable = (GradientDrawable)holder.tvOrderState.getBackground();
+        switch (holder.tvOrderState.getText().toString()){
+            case "Abierto":
+                drawable.setColor(Color.alpha(R.color.stateOpen));
+                Log.d(TAG, "onBindViewHolder: Enter case abierto");
+                break;
+            case "Trabajando":
+                drawable.setColor(Color.alpha(R.color.stateWorking));
+                break;
+            case "Entregado":
+                drawable.setColor(Color.alpha(R.color.stateDone));
+                break;
+            case "Cancelado":
+                drawable.setColor(Color.alpha(R.color.stateCancel));
+                break;
+            case "Espera confirmacion":
+                drawable.setColor(Color.alpha(R.color.stateWait));
+                break;
+        }
+        holder.tvRecipeName.setText(order.getRecipes());
         holder.orderCardView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
                         //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
                         CardView cv = (CardView)v;
+                    TextView tvRecipe = (TextView) cv.findViewById(R.id.txtRecipes);
+                    if (tvRecipe.getVisibility()== View.GONE)
+                    {
+                        tvRecipe.setVisibility(View.VISIBLE);
+                    }else {
+                        tvRecipe.setVisibility(View.GONE);
+                    }
                         RecyclerView rv = (RecyclerView)v.getParent();
                         toggleSelection(position);
                         if(isToggleSelection(position)){
@@ -78,7 +104,10 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
                         cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
 
                         }
+
                         displayFloatingActionButtons();
+                    Log.d(TAG, "onClick: "+order.toString());
+                    Log.d(TAG, "onClick: size "+ getSelectedIds().size());
                         }
         });
         }
@@ -131,6 +160,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
         public TextView tvClientName;
         public TextView tvDeliveryDate;
         public TextView tvOrderState;
+        public TextView tvRecipeName;
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_order, parent, false));
             orderCardView = (CardView)itemView.findViewById(R.id.OrderCardView);
@@ -138,6 +168,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
             tvClientName = (TextView)itemView.findViewById(R.id.txtClientName);
             tvDeliveryDate = (TextView)itemView.findViewById(R.id.txtDeliveryDate);
             tvOrderState = (TextView)itemView.findViewById(R.id.txtOrderState);
+            tvRecipeName = (TextView)itemView.findViewById(R.id.txtRecipes);
         }
     }
 

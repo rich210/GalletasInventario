@@ -178,7 +178,7 @@ public class RecipeDBAdapter {
         recipe.setMeasureTypeQuantity(cursor.getInt(cursor.getColumnIndex(QUANTITY)));
         recipe.setRecipeCost(cursor.getFloat(cursor.getColumnIndex(RECIPE_COST)));
         recipe.setRecipeImagePath(cursor.getString(cursor.getColumnIndex(IMAGE_PATH)));
-        //recipe.setRecipeInstructions(cursor.getString(cursor.getColumnIndex(RECIPE_INSTRUCTIONS)));
+        recipe.setRecipeInstructions(cursor.getString(cursor.getColumnIndex(RECIPE_INSTRUCTIONS)));
         try {
             recipeProductDBAdapter.open();
             List<RecipeProduct> recipeProducts = recipeProductDBAdapter.getAllItemsByRecipeId(recipe.getRecipeId());
@@ -201,6 +201,7 @@ public class RecipeDBAdapter {
         values.put(QUANTITY, recipe.getMeasureTypeQuantity());
         //values.put(RECIPE_COST, recipe.getRecipeCost(mCtx));
         values.put(IMAGE_PATH,recipe.getRecipeImagePath());
+        values.put(RECIPE_INSTRUCTIONS,recipe.getRecipeInstructions());
 
         values.put(UPDATED_ON, sdf.format(new Date(0)));
         if (isUpdate) {

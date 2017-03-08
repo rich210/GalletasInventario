@@ -11,17 +11,22 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.measurementsTypes.FormMeasurement" />
-        <activity android:name=".views.products.FormProduct" />
-        <activity android:name=".views.recipes.FormRecipe" />
-        <activity android:name=".views.orders.FormOrder"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
+        <activity android:name=".views.measurementsTypes.FormMeasurement"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".views.products.FormProduct"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".views.recipes.FormRecipe"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".views.orders.FormOrder"
+            android:screenOrientation="portrait"/><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->
         <meta-data
             android:name="com.google.android.gms.version"

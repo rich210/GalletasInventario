@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 
 import com.example.resparza.galletasinventariosv2.models.OrderRecipe;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 public class OrderRecipeDBAdapter {
 
+    public static final String TAG = "OrderRecipeDBAdapter";
     public static final String RECIPE_ID = "recipe_id";
     public static final String ORDER_ID = "order_id";
     public static final String ORDER_QUANTITY = "order_quantity";
@@ -48,9 +50,9 @@ public class OrderRecipeDBAdapter {
         this.mDbHelper.close();
     }
 
-    public long insertItem(OrderRecipe ordRec) {
+    public long insertItem(OrderRecipe ordRec, SQLiteDatabase mDb) {
         ContentValues initialValues = itemToValues(ordRec, false);
-        return this.mDb.insert(ORDER_RECIPE_TABLE, null, initialValues);
+        return mDb.insert(ORDER_RECIPE_TABLE, null, initialValues);
     }
 
     public boolean deleteOrderRecipeByRecipeId(long recipeId) {
@@ -95,17 +97,19 @@ public class OrderRecipeDBAdapter {
 
     public List<OrderRecipe> getItemsByOrderId(long orderId) {
         List<OrderRecipe> orderRecipes = new ArrayList<OrderRecipe>();
-        String selectQuery = "SELECT  * FROM " + ORDER_RECIPE_TABLE + " WHERE "
-                + RECIPE_ID + " = " + orderId;
+        RecipeDBAdapter recipeDBAdapter = new RecipeDBAdapter(mCtx);
+        String selectQuery = "SELECT  * FROM " + ORDER_RECIPE_TABLE + " t1" +
+                " JOIN "+recipeDBAdapter.RECIPE_TABLE+" t2 on t1."+RECIPE_ID+" = t2."+recipeDBAdapter.RECIPE_ID+" WHERE t1."
+                + ORDER_ID + " = " + orderId;
         Cursor c = this.mDb.rawQuery(selectQuery, null);
         orderRecipes = obtainListOrderRecipe(c);
         return orderRecipes;
     }
 
-    public boolean updateItem(OrderRecipe orderRecipe) {
+    public boolean updateItem(OrderRecipe orderRecipe, SQLiteDatabase mDb) {
 
         ContentValues values = itemToValues(orderRecipe, true);
-        return this.mDb.update(ORDER_RECIPE_TABLE, values, RECIPE_ID + "=" + orderRecipe.getRecipeId() +" and " + ORDER_ID + "=" + orderRecipe.getOrderId(), null) >0;
+        return mDb.update(ORDER_RECIPE_TABLE, values, RECIPE_ID + "=" + orderRecipe.getRecipeId() +" and " + ORDER_ID + "=" + orderRecipe.getOrderId(), null) >0;
     }
 
     public List<OrderRecipe> obtainListOrderRecipe(Cursor c){
@@ -141,6 +145,7 @@ public class OrderRecipeDBAdapter {
         orderRecipe.setTotal(c.getFloat(c.getColumnIndex(TOTAL)));
         orderRecipe.setPricePerUnit(c.getFloat(c.getColumnIndex(PRICE_PER_UNIT)));
         orderRecipe.setOrderQuantity(c.getInt(c.getColumnIndex(ORDER_QUANTITY)));
+        orderRecipe.setRecipeName(c.getString(c.getColumnIndex("recipe_name")));
         return orderRecipe;
     }
 

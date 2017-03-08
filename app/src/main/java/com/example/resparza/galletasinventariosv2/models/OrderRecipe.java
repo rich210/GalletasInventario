@@ -8,15 +8,23 @@ public class OrderRecipe {
     private long orderId;
     private long recipeId;
     //quantity per reciepe, 1 cake, 10 cookies, 50 bombones
-    private int orderQuantity;
-    private float pricePerUnit;
-    private float total;
+    private double orderQuantity;
+    private double pricePerUnit;
+    private double total;
+    private String recipeName;
 
     public OrderRecipe() {
     }
 
-    public OrderRecipe(long orderId, long recipeId, int orderQuantity, float pricePerUnit, float total) {
+    public OrderRecipe(long orderId, long recipeId, double orderQuantity, double pricePerUnit, double total) {
         this.orderId = orderId;
+        this.recipeId = recipeId;
+        this.orderQuantity = orderQuantity;
+        this.pricePerUnit = pricePerUnit;
+        this.total = total;
+    }
+
+    public OrderRecipe(long recipeId, double orderQuantity, double pricePerUnit, double total) {
         this.recipeId = recipeId;
         this.orderQuantity = orderQuantity;
         this.pricePerUnit = pricePerUnit;
@@ -27,7 +35,7 @@ public class OrderRecipe {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
 
@@ -35,31 +43,39 @@ public class OrderRecipe {
         return recipeId;
     }
 
-    public void setRecipeId(int recipeId) {
+    public void setRecipeId(long recipeId) {
         this.recipeId = recipeId;
     }
 
-    public int getOrderQuantity() {
+    public double getOrderQuantity() {
         return orderQuantity;
     }
 
-    public void setOrderQuantity(int orderQuantity) {
+    public void setOrderQuantity(double orderQuantity) {
         this.orderQuantity = orderQuantity;
     }
 
-    public float getPricePerUnit() {
+    public double getPricePerUnit() {
         return pricePerUnit;
     }
 
-    public void setPricePerUnit(float pricePerUnit) {
+    public void setPricePerUnit(double pricePerUnit) {
         this.pricePerUnit = pricePerUnit;
     }
 
-    public float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(float total) {
+    public void setTotal(double total) {
         this.total = total;
+    }
+
+    public String getRecipeName() {
+        return recipeName;
+    }
+
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
     }
 }

@@ -13,16 +13,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.adapters.ProductContentAdapter;
+import com.example.resparza.galletasinventariosv2.dbadapters.OrderDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.ProductDBAdapter;
+import com.example.resparza.galletasinventariosv2.models.Order;
 import com.example.resparza.galletasinventariosv2.models.Product;
 
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.List;
 
 /*
@@ -89,6 +93,7 @@ public class Main extends Fragment {
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        CalendarView calendarView = (CalendarView) rootView.findViewById(R.id.calendarView);
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
         ProductDBAdapter productDBAdapter = new ProductDBAdapter(recyclerView.getContext());
         List<Product> products = null;
@@ -103,10 +108,25 @@ public class Main extends Fragment {
         }finally {
             productDBAdapter.close();
         }
-        adapter = new ProductContentAdapter(recyclerView.getContext(),products);
+        adapter = new ProductContentAdapter(recyclerView.getContext(),products, false);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setFocusable(false);
+
+        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
+        List<Order> orders = null;
+        try {
+            orderDBAdapter.open();
+            orders = orderDBAdapter.getAllItemsByDate(Calendar.getInstance().getTime());
+            orderDBAdapter.close();
+            for (Order order:orders) {
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         //recyclerView.setBackgroundResource(R.color.listPrimary);
         initFloatingActionButtons();
         return rootView;

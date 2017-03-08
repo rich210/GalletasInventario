@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.util.StringBuilderPrinter;
 
+import com.example.resparza.galletasinventariosv2.models.Recipe;
+
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,7 +21,7 @@ public class DBAdapter {
     public static final String DATABASE_NAME = "cookieManager"; //$NON-NLS-1$
     public static final String TAG = "DBAdapter";
 
-    public static final int DATABASE_VERSION = 3; //TODO: Update database to insert column in recipe table
+    public static final int DATABASE_VERSION = 4; //TODO: Update database to insert column in recipe table
 
 
     private static final String CREATE_TABLE_TBL_PRODUCTS =
@@ -54,6 +56,7 @@ public class DBAdapter {
                     + OrderDBAdapter.CLIENT_NAME+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.CLIENT_NUMBER+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.DELIVERY_DATE+" TEXT," //$NON-NLS-1$
+                    + OrderDBAdapter.ORDER_STATUS+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.SELL_PRICE+" REAL," //$NON-NLS-1$
                     + OrderDBAdapter.TOTAL+" REAL," //$NON-NLS-1$
                     + OrderDBAdapter.CREATED_ON+" TEXT," //$NON-NLS-1$
@@ -160,7 +163,8 @@ public class DBAdapter {
                     + MeasureTypeDBAdapter.CREATED_ON+" ," //$NON-NLS-1$
                     + MeasureTypeDBAdapter.UPDATED_ON+") values "
                     + "('Gramos', 'gr', 1, '"+ date +"','"+date+"' ),"
-                    + "('Mililitros', 'ml', 1, '"+ date +"','"+date+"' );");
+                    + "('Mililitros', 'ml', 1, '"+ date +"','"+date+"' ),"
+                    + "('Piezas', 'pz', 1, '"+ date +"','"+date+"' )");
 
             db.execSQL("insert into "+MeasureTypeDBAdapter.MEASURE_TABLE + "("
                     + MeasureTypeDBAdapter.MEASURE_NAME+" ," //$NON-NLS-1$
@@ -172,6 +176,46 @@ public class DBAdapter {
                     + MeasureTypeDBAdapter.UPDATED_ON+") values "
                     + "('Kilogramos', 'kg', 1, 1000, 0,'"+ date +"','"+date+"'),"
                     + "('Litros','l', 2, 1000, 0,'"+ date +"','"+date+"');");
+            //TODO: Delete this block on production
+            db.execSQL("insert into "+ProductDBAdapter.PRODUCT_TABLE +"("
+                    + ProductDBAdapter.PRODUCT_NAME + ", "
+                    + ProductDBAdapter.MEASURE_TYPE_ID + ", "
+                    + ProductDBAdapter.QUANTITY + ", "
+                    + ProductDBAdapter.COST_PER_UNIT + ", "
+                    + ProductDBAdapter.PRODUCT_MIN + ", "
+                    + ProductDBAdapter.CREATED_ON + ", "
+                    + ProductDBAdapter.UPDATED_ON + ") values "
+                    + "('Harina',1,500,0.1,200,'"+date+"','"+date+"'),"
+                    + "('Leche',2,500,0.1,200,'"+date+"','"+date+"'),"
+                    + "('Vainilla',2,500,0.1,200,'"+date+"','"+date+"'),"
+                    + "('Chocolate',1,500,0.1,200,'"+date+"','"+date+"');");
+            db.execSQL("insert into "+ RecipeDBAdapter.RECIPE_TABLE +"("
+                    + RecipeDBAdapter.RECIPE_NAME + ", "
+                    + RecipeDBAdapter.QUANTITY + ", "
+                    + RecipeDBAdapter.RECIPE_COST + ", "
+                    + RecipeDBAdapter.IMAGE_PATH + ", "
+                    + RecipeDBAdapter.RECIPE_INSTRUCTIONS + ", "
+                    + RecipeDBAdapter.CREATED_ON + ", "
+                    + RecipeDBAdapter.UPDATED_ON + ") values "
+                    + "('Pastel',20,100,null,'na na','"+date+"','"+date+"'),"
+                    + "('Galletas',20,30,null,null,'"+date+"','"+date+"'),"
+                    + "('Muffins',5,20,null,'bake','"+date+"','"+date+"');");
+            db.execSQL("insert into "+ RecipeProductDBAdapter.RECIPE_PRODUCT_TABLE +"("
+                    + RecipeProductDBAdapter.RECIPE_ID + ", "
+                    + RecipeProductDBAdapter.PRODUCT_ID + ", "
+                    + RecipeProductDBAdapter.PRODUCT_QUANTITY + ", "
+                    + RecipeProductDBAdapter.MEASUREMENT_TYPE_ID + ", "
+                    + RecipeProductDBAdapter.CREATED_ON + ", "
+                    + RecipeProductDBAdapter.UPDATED_ON + ") values "
+                    + "(1,1,100,1,'"+date+"','"+date+"'),"
+                    + "(1,2,100,2,'"+date+"','"+date+"'),"
+                    + "(1,3,50,2,'"+date+"','"+date+"'),"
+                    + "(2,1,90,1,'"+date+"','"+date+"'),"
+                    + "(2,2,50,2,'"+date+"','"+date+"'),"
+                    + "(2,3,30,2,'"+date+"','"+date+"'),"
+                    + "(3,1,10,1,'"+date+"','"+date+"'),"
+                    + "(4,2,40,2,'"+date+"','"+date+"'),"
+                    + "(5,4,30,2,'"+date+"','"+date+"');");
 
 
         }

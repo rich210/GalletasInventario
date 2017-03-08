@@ -105,11 +105,11 @@ public class Product {
 
     public String getQuantityInfo(){
 
-        return     "Cantidad restante: "+quantity + " " + measureType.getMeasureSymbol()+".";
+        return     "Cantidad: "+quantity + " " + measureType.getMeasureSymbol()+".";
     }
 
     public String getCostPerUnitInfo(){
-        return     "Costo por unidad: "+ String.format("%.2f", getCostPerUnit())+".";
+        return     "c/u: "+ String.format("%.2f", getCostPerUnit())+".";
     }
 
     public boolean isLowerThanMin() {

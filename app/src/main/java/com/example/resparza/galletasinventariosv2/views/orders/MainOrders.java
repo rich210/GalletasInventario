@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
@@ -57,6 +58,7 @@ public class MainOrders extends Fragment implements View.OnClickListener {
     private FloatingActionButton efab;
 
     private RecyclerView recyclerView;
+    private OrderContentAdapter adapter;
 
 
     public MainOrders() {
@@ -102,12 +104,22 @@ public class MainOrders extends Fragment implements View.OnClickListener {
             intent.putExtra(IS_UPDATE,false);
             startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
         }
-        OrderContentAdapter adapter = new OrderContentAdapter(recyclerView.getContext(),recipes);
+        adapter = new OrderContentAdapter(recyclerView.getContext(),recipes);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         initFloatingActionButtons();
         return recyclerView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        List<Order> orders = getOrders();
+        adapter = new OrderContentAdapter(recyclerView.getContext(),orders);
+        adapter.clearSelectedIds();
+        recyclerView.setAdapter(adapter);
+        initFloatingActionButtons();
     }
 
     private void initFloatingActionButtons(){
@@ -135,17 +147,19 @@ public class MainOrders extends Fragment implements View.OnClickListener {
                 startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
                 break;
             case R.id.Editfab:
-                //selected = mAdapter.getSelectedIds();
-                //size = (short) selected.size();
-                //if (size > 1) {
-//                    Toast.makeText(ProductMainActivity.this, "More that one product is selected", Toast.LENGTH_SHORT).show();
-                //} else if (size == 1) {
+                Log.d(TAG, "onClick: Clicked edit buttton");
+                selected = adapter.getSelectedIds();
+                size = (short) selected.size();
+                Log.d(TAG, "onClick: "+ size);
+                if (size > 1) {
+                    Toast.makeText(v.getContext(), "More that one order is selected", Toast.LENGTH_SHORT).show();
+                } else if (size == 1) {
                 intent = new Intent(getActivity(), FormOrder.class);
-                //selectedId = mAdapter.getItemId(selected.keyAt(0));
+                selectedId = adapter.getItemId(selected.keyAt(0));
                 intent.putExtra(IS_UPDATE,true);
-                //intent.putExtra(EXTRA_SELECTED_PRODUCT_ID, selectedId);
+                intent.putExtra(EXTRA_SELECTED_ORDER_ID, selectedId);
                 startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
-                //}
+                }
                 break;
             case R.id.Deletefab:
                 //showDeleteDialogConfirmation();

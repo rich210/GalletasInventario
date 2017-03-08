@@ -25,13 +25,15 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
     private List<Product> lItems;
     private SparseBooleanArray mSelectedItemsIds;
     private Context context;
+    private boolean isClickable;
     public static final String TAG = "ProductContentAdapter";
 
 
-    public ProductContentAdapter(Context context, List<Product> products) {
+    public ProductContentAdapter(Context context, List<Product> products, boolean isClickable) {
         this.lItems = products;
         this.mSelectedItemsIds = new SparseBooleanArray();
         this.context= context;
+        this.isClickable = isClickable;
     }
 
     @Override
@@ -46,26 +48,29 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
         holder.productName.setText(product.getProductName());
         holder.productQuantity.setText(product.getQuantityInfo());
         holder.productCostPerUnit.setText(product.getCostPerUnitInfo());
-        holder.productCardView.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
-                CardView cv = (CardView)v;
-                RecyclerView rv = (RecyclerView)v.getParent();
-                toggleSelection(position);
-                if(isToggleSelection(position)){
-                    cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
+            if(isClickable){
+                holder.productCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View v) {
+                        //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
+                        CardView cv = (CardView)v;
+                        RecyclerView rv = (RecyclerView)v.getParent();
+                        toggleSelection(position);
+                        if(isToggleSelection(position)){
+                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
 
-                }else{
-                    if (product.isLowerThanMin()){
-                        cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemProductLowerThanMin));
-                    }else {
-                        cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
+                        }else{
+                            if (product.isLowerThanMin()){
+                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemProductLowerThanMin));
+                            }else {
+                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
+                            }
+                        }
+                        displayFloatingActionButtons();
+                        Log.d(TAG,product.getInfo());
                     }
-                }
-                displayFloatingActionButtons();
-                Log.d(TAG,product.getInfo());
-            }
-        });
+                });
+        }
+
         if (product.isLowerThanMin()){
             holder.productCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.itemProductLowerThanMin));
         }else {

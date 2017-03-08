@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -21,12 +22,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.adapters.SpinnerRecipeAdapter;
+import com.example.resparza.galletasinventariosv2.dbadapters.OrderDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.RecipeDBAdapter;
+import com.example.resparza.galletasinventariosv2.models.Order;
+import com.example.resparza.galletasinventariosv2.models.OrderRecipe;
 import com.example.resparza.galletasinventariosv2.models.Recipe;
 
+import org.w3c.dom.Text;
+
+import java.sql.Array;
 import java.sql.SQLException;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
@@ -44,21 +52,14 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
     private DatePicker dpDeliveryDate;
     private LinearLayout llRecipes;
     private ArrayList<LinearLayout> linearLayoutArray;
-    /*This should be created by program
-    private Spinner spinnerRecipes;
-    private CalendarView calendar;
-    private EditText etQuantity;
-    private TextView tvRecipePortion;
-    private TextView tvCostRecipe;
-    private TextView tvTotalRecipes;
-    private ImageButton ibRemoveRecipe;
-
-    */
+    private Spinner sOrderState;
+    private TextView tvErrorSpinnerOrderState;
     private ImageButton ibAddRecipe;
     private TextView tvTotalCost;
     private EditText etPriceToSell;
     private TextView tvGain;
     private Button btnSave;
+    private boolean isUpdate;
 
 
 
@@ -67,17 +68,16 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.form_order);
         Intent intent = getIntent();
-        String tittle;
+        String tittle = "Agrega orden";
         initView();
-        if(intent.getExtras().getBoolean(MainOrders.IS_UPDATE)){
-            //long id = intent.getExtras().getLong(MeasureTypeMainActivity.EXTRA_SELECTED_MEASURE_ID);
-            //if (id != 0) {
-            //loadMeasureType(id);
+        isUpdate = intent.getExtras().getBoolean(MainOrders.IS_UPDATE);
+        if(isUpdate){
+            long id = intent.getExtras().getLong(MainOrders.EXTRA_SELECTED_ORDER_ID);
+            if (id != 0) {
+            loadData(id);
             tittle = "Actualizar orden";
-
-            //}
+            }
         }else {
-            tittle = "Agrega orden";
             addRecipeForm(null);
         }
         setTitle(tittle);
@@ -116,8 +116,42 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         this.btnSave = (Button) findViewById(R.id.btnSaveOrder);
         this.ibAddRecipe.setOnClickListener(this);
         this.btnSave.setOnClickListener(this);
-
-
+        this.sOrderState = (Spinner)findViewById(R.id.sOrderState);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this,R.array.orderStates,android.R.layout.simple_spinner_item);
+        /*final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
+                this,R.layout.spinner_item,getResources().getStringArray(R.array.orderStates)){
+            @Override
+            public boolean isEnabled(int position){
+                if(position == 0)
+                {
+                    // Disable the first item from Spinner
+                    // First item will be use for hint
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            @Override
+            public View getDropDownView(int position, View convertView,
+                                        ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if(position == 0){
+                    // Set the hint text color gray
+                    tv.setTextColor(getResources().getColor(R.color.listSecondary));
+                }
+                else {
+                    tv.setTextColor(getResources().getColor(R.color.colorPrimaryTextDark));
+                }
+                return view;
+            }
+        };
+        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);*/
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.sOrderState.setAdapter(adapter);
+        this.tvErrorSpinnerOrderState = (TextView)findViewById(R.id.tvErrorSpinnerOrderState);
     }
 
     @Override
@@ -131,34 +165,151 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                 break;
             case R.id.btnSaveOrder:
                 Log.d(TAG, "Save button clicked");
-//                saveOrder();
+                saveOrder();
                 break;
-            /*case R.id.btnTakePictureRecipe:
-                Log.d(TAG, "Take picture clicked");
-                selectImage();
-                break;*/
             default:
                 Log.d(TAG, "Button clicked");
-//                removeProductForm(v);
                 break;
         }
     }
 
     private void saveOrder(){
-        int orderId = Integer.valueOf((this.tvOrderId.getText().toString().isEmpty())?"0": this.tvOrderId.getText().toString());
-        String clientName = this.etClientName.getText().toString();
-        int day = this.dpDeliveryDate.getDayOfMonth();
-        int month = this.dpDeliveryDate.getMonth() + 1;
-        int year = this.dpDeliveryDate.getYear();
+        long orderId;
+        int day;
+        int month;
+        int year;
+        double totalCost;
+        double priceToSell;
+        double gain;
+        String clientName;
+        String orderStatus;
         Calendar calendar = Calendar.getInstance();
-        calendar.set(year,month,day);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date deliveryDate;
+        Order order = new Order();
+        List<OrderRecipe> orderRecipes = new ArrayList<OrderRecipe>();
+        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(this);
 
-        Date deliveryDate = calendar.getTime();
+        if(isValid()){
+            Log.d(TAG, "saveOrder: The form is valid");
+            orderId = Long.valueOf((this.tvOrderId.getText().toString().isEmpty())?"0": this.tvOrderId.getText().toString());
+            clientName = this.etClientName.getText().toString();
+            day = this.dpDeliveryDate.getDayOfMonth();
+            month = this.dpDeliveryDate.getMonth() + 1;
+            year = this.dpDeliveryDate.getYear();
+            calendar.set(year,month,day);
+            deliveryDate = calendar.getTime();
+            totalCost = Double.valueOf(this.tvTotalCost.getText().toString());
+            priceToSell = Double.valueOf(this.etPriceToSell.getText().toString());
+            gain = Double.valueOf(this.tvGain.getText().toString());
+            orderStatus = this.sOrderState.getSelectedItem().toString();
+            for (int i = 0; i< this.llRecipes.getChildCount(); i++){
+                ViewGroup viewGroup = (ViewGroup)this.llRecipes.getChildAt(i);
+                Spinner spinner = (Spinner)viewGroup.findViewById(R.id.sRecipes);
+                EditText etQuantity = (EditText)viewGroup.findViewById(R.id.txtQuantity);
+                TextView tvTotalPortions = (TextView)viewGroup.findViewById(R.id.txtTotalPortion); //
+                TextView tvCostPerUnit = (TextView)viewGroup.findViewById(R.id.txtCostPerRecipe);
+                TextView tvTotalRecipes = (TextView)viewGroup.findViewById(R.id.txtTotalRecipes);
+                double quantity = Double.valueOf(etQuantity.getText().toString());
+                double totalPortions = Double.valueOf(tvTotalPortions.getText().toString());
+                double costPerUnit = Double.valueOf(tvCostPerUnit.getText().toString());
+                double totalRecipes = Double.valueOf(tvTotalRecipes.getText().toString());
+                Recipe recipe = (Recipe)spinner.getSelectedItem();
+                OrderRecipe orderRecipe = new OrderRecipe(recipe.getRecipeId(),quantity, costPerUnit,totalRecipes);
+                if(isUpdate){
+                    orderRecipe.setOrderId(orderId);
+                }
+                orderRecipes.add(orderRecipe);
+            }
+
+            order.setClientName(clientName);
+            order.setDeliveryDate(deliveryDate);
+            order.setOrderRecipes(orderRecipes);
+            order.setTotal(totalCost);
+            order.setSellPrice(priceToSell);
+            order.setGain(gain);
+            order.setOrderStatus(orderStatus);
+            try {
+                orderDBAdapter.open();
+                if(isUpdate){
+                    Log.d(TAG, "saveOrder: Is update");
+                    order.setOrderId(Long.valueOf(this.tvOrderId.getText().toString()));
+                    if(orderDBAdapter.updateItem(order)){
+                        setResult(RESULT_OK);
+                        Log.d(TAG, "saveOrder: The order was updated correctyl");
+                        orderDBAdapter.close();
+                        finish();
+                    }else{
+                        Log.d(TAG, "saveOrder: the order is not updated correctly");
+                    }
+                }else{
+                    order.setOrderId(orderDBAdapter.insertItem(order));
+                    if(order.getOrderId()>0){
+                        setResult(RESULT_OK);
+                        Log.d(TAG, "saveOrder: The order was inserted correctly");
+                        orderDBAdapter.close();
+                        finish();
+                    }else{
+                        Log.e(TAG, "saveOrder: Error inserting order");
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }else{
+            Log.d(TAG, "saveOrder: Is not valid");
+        }
+
 
     }
 
-    private void addRecipeForm(Recipe recipe){
+    private boolean isValid(){
+        boolean isValid = true;
+        if(this.etClientName.getText().toString().isEmpty()){
+            this.etClientName.setError(this.etClientName.getHint() + getResources().getString(R.string.requiredErrorText));
+            isValid = false;
+        }
+        for (int i = 0; i< this.llRecipes.getChildCount(); i++){
+            ViewGroup viewGroup = (ViewGroup)this.llRecipes.getChildAt(i);
+            Spinner spinner = (Spinner)viewGroup.findViewById(R.id.sRecipes);
+            EditText etQuantity = (EditText)viewGroup.findViewById(R.id.txtQuantity);
+            if( spinner.getSelectedItemId()<=0){
+                Toast.makeText(this, "Seleccione una receta",Toast.LENGTH_LONG);
+                TextView tvErrorRecipe = (TextView)viewGroup.findViewById(R.id.tvErrorRecipe);
+                tvErrorRecipe.setVisibility(View.VISIBLE);
+                isValid = false;
+            }
+            if (etQuantity.getText().toString().isEmpty()){
+                etQuantity.setError(etQuantity.getHint() + getResources().getString(R.string.requiredErrorText));
+                isValid = false;
+            }
+
+        }
+        if (this.tvTotalCost.getText().toString().isEmpty()) {
+            this.tvTotalCost.setError("No se a asignado el precio total");
+            isValid = false;
+        }
+        if(etPriceToSell.getText().toString().isEmpty()){
+            etPriceToSell.setError("Precio a vender es requerido");
+            isValid = false;
+        }
+        if (tvGain.getText().toString().isEmpty()){
+            tvGain.setError("Ganancia no asignada");
+            isValid = false;
+        }
+        if(this.sOrderState.getSelectedItemId()<=0){
+            tvErrorSpinnerOrderState.setVisibility(View.VISIBLE);
+            isValid = false;
+        }
+        if(isUpdate){
+            if(this.tvOrderId.getText().toString().isEmpty()){
+                Toast.makeText(this,"Error updating",Toast.LENGTH_SHORT);
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
+
+    private void addRecipeForm(final OrderRecipe orderRecipe){
         // inflate content layout and add it to the relative layout as second child
         // add as second child, therefore pass index 1 (0,1,...)
         LinearLayout linearLayout = (LinearLayout)View.inflate(this,R.layout.form_order_recipe,null);
@@ -176,6 +327,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemSelected: item was selected");
                 Recipe recipe = (Recipe) parent.getItemAtPosition(position);
                 if(recipe.getRecipeId()>0){
                     tvRecipePortion.setText(String.valueOf(recipe.getQuantity()));
@@ -183,7 +335,10 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                     etQuantity.setFocusable(true);
                     etQuantity.setFocusableInTouchMode(true);
                     etQuantity.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
-                    Log.d(TAG, "onItemSelected: "+etQuantity.toString());
+                    etQuantity.requestFocus();
+                }
+                if (orderRecipe != null) {
+                    etQuantity.setText(String.valueOf(orderRecipe.getOrderQuantity()));
                 }
 
             }
@@ -192,14 +347,19 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
 
             }
         });
+        if (orderRecipe != null) {
+            spinner.setSelection(spinnerRecipeAdapter.getPositionById(orderRecipe.getRecipeId()));
+        }
 
         etQuantity.addTextChangedListener(new CustomTextWatcher(etQuantity, getApplicationContext()));
         linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         if(llRecipes.getChildCount()==0){
             ibRemoveRecipe.setVisibility(View.GONE);
         }
+
         llRecipes.addView(linearLayout);
         linearLayoutArray.add(linearLayout);
+
 
     }
 
@@ -231,7 +391,8 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         for (int i = 0; i< this.llRecipes.getChildCount(); i++){
             ViewGroup viewGroup = (ViewGroup)this.llRecipes.getChildAt(i);
             TextView totalRecipeCost = (TextView)viewGroup.findViewById(R.id.txtTotalRecipes);
-            total = total + Double.valueOf(totalRecipeCost.getText().toString());
+            String sTotalRecipeCost = totalRecipeCost.getText().toString();
+            total = total + Double.valueOf((sTotalRecipeCost.isEmpty())?"0":sTotalRecipeCost);
         }
         this.tvTotalCost.setText(String.valueOf(total));
         this.etPriceToSell.setFocusable(true);
@@ -242,9 +403,49 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
     public void getTotalGain(){
         double total =0;
         double totalCost = Double.valueOf((this.tvTotalCost.getText().toString().isEmpty())? "0": this.tvTotalCost.getText().toString());
-        double sell = Double.valueOf(this.etPriceToSell.getText().toString());
+        double sell = Double.valueOf((this.etPriceToSell.getText().toString().isEmpty())?"0": this.etPriceToSell.getText().toString());
         total = sell - totalCost;
         this.tvGain.setText(String.valueOf(total));
+    }
+
+    public void loadData(long id){
+        Order order;
+        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(this);
+        try {
+            orderDBAdapter.open();
+            order = orderDBAdapter.getItemById(id);
+            orderDBAdapter.close();
+            this.tvOrderId.setText(String.valueOf(order.getOrderId()));
+            this.etClientName.setText(String.valueOf(order.getClientName()));
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(order.getDeliveryDate());
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            this.dpDeliveryDate.updateDate(year,month,day);
+            for (OrderRecipe orderRecipe: order.getOrderRecipes()) {
+                addRecipeForm(orderRecipe);
+            }
+            this.tvTotalCost.setText(String.valueOf(order.getTotal()));
+            this.etPriceToSell.setText(String.valueOf(order.getSellPrice()));
+            this.tvGain.setText(String.valueOf(order.getGain()));
+            String[] strings = getResources().getStringArray(R.array.orderStates);
+            int position = 0;
+            for (int i = 0; i<strings.length; i++){
+                if(order.getOrderStatus().equals(strings[i])){
+                    position = i;
+                    break;
+                }
+            }
+            this.sOrderState.setSelection(position);
+            this.getTotalGain();
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     class CustomTextWatcher implements TextWatcher {
@@ -295,9 +496,13 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         public void afterTextChanged(Editable s) {
             switch (this.textChanged){
                 case 1:
-                    double quantity = Double.valueOf(this.tvRecipeQuantity.getText().toString());
-                    int recipePortion = Integer.valueOf(this.tvRecipePortions.getText().toString());
-                    double costPerPortion = Double.valueOf(this.tvCostPerPortions.getText().toString());
+                    String sQuantity = this.tvRecipeQuantity.getText().toString();
+                    String sRecipePortion = this.tvRecipePortions.getText().toString();
+                    String sCostPerPortion = this.tvCostPerPortions.getText().toString();
+                    Log.d(TAG, "afterTextChanged: "+sRecipePortion + " " + sCostPerPortion);
+                    double quantity = Double.valueOf((sQuantity.isEmpty())?"0": sQuantity);
+                    int recipePortion = Integer.valueOf((sRecipePortion.isEmpty())?"0": sRecipePortion);
+                    double costPerPortion = Double.valueOf((sCostPerPortion.isEmpty())?"0":sCostPerPortion);
 
                     double totalPortions = quantity*recipePortion;
                     double totalCost = quantity*costPerPortion;

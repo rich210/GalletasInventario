@@ -1,6 +1,8 @@
 package com.example.resparza.galletasinventariosv2.models;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by resparza on 27/01/2016.
@@ -12,16 +14,16 @@ public class Order {
     private String clientName;
     private String clientNumber;
     private Date deliveryDate;
-    private OrderRecipe[] orderRecipes;
-    private float total;
-    private float sellPrice;
-    private float gain;
+    private List<OrderRecipe> orderRecipes;
+    private double total;
+    private double sellPrice;
+    private double gain;
     private String orderStatus;
 
     public Order() {
     }
 
-    public Order(String clientName, String clientNumber, Date deliveryDate, OrderRecipe[] orderRecipes, float total, float sellPrice) {
+    public Order(String clientName, String clientNumber, Date deliveryDate, List<OrderRecipe> orderRecipes, double total, double sellPrice) {
         this.clientName = clientName;
         this.clientNumber = clientNumber;
         this.deliveryDate = deliveryDate;
@@ -30,7 +32,7 @@ public class Order {
         this.sellPrice = sellPrice;
     }
 
-    public Order(int orderId, String clientName, String clientNumber, Date deliveryDate, OrderRecipe[] orderRecipes, float total, float sellPrice) {
+    public Order(int orderId, String clientName, String clientNumber, Date deliveryDate, List<OrderRecipe> orderRecipes, double total, double sellPrice) {
         this.orderId = orderId;
         this.clientName = clientName;
         this.clientNumber = clientNumber;
@@ -80,35 +82,35 @@ public class Order {
         this.deliveryDate = deliveryDate;
     }
 
-    public OrderRecipe[] getOrderRecipes() {
+    public List<OrderRecipe> getOrderRecipes() {
         return orderRecipes;
     }
 
-    public void setOrderRecipes(OrderRecipe[] orderRecipes) {
+    public void setOrderRecipes(List<OrderRecipe> orderRecipes) {
         this.orderRecipes = orderRecipes;
     }
 
-    public float getTotal() {
+    public double getTotal() {
         return total;
     }
 
-    public void setTotal(float total) {
+    public void setTotal(double total) {
         this.total = total;
     }
 
-    public float getSellPrice() {
+    public double getSellPrice() {
         return sellPrice;
     }
 
-    public void setSellPrice(float sellPrice) {
+    public void setSellPrice(double sellPrice) {
         this.sellPrice = sellPrice;
     }
 
-    public float getGain() {
+    public double getGain() {
         return gain;
     }
 
-    public void setGain(float gain) {
+    public void setGain(double gain) {
         this.gain = gain;
     }
 
@@ -118,5 +120,40 @@ public class Order {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getFormatedDelivaryDate(){
+        String date = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+        date = sdf.format(this.deliveryDate);
+        return date;
+    }
+
+    public String getRecipes(){
+        StringBuilder recipeNames = new StringBuilder();
+        for (OrderRecipe orderRecipe:this.orderRecipes) {
+            if(!recipeNames.toString().isEmpty()){
+                recipeNames.append(" \n");
+            }
+            recipeNames.append(orderRecipe.getRecipeName());
+
+        }
+        return recipeNames.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderId=" + orderId +
+                ", orderName='" + orderName + '\'' +
+                ", clientName='" + clientName + '\'' +
+                ", clientNumber='" + clientNumber + '\'' +
+                ", deliveryDate=" + deliveryDate +
+                ", orderRecipes=" + orderRecipes +
+                ", total=" + total +
+                ", sellPrice=" + sellPrice +
+                ", gain=" + gain +
+                ", orderStatus='" + orderStatus + '\'' +
+                '}';
     }
 }

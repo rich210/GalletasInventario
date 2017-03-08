@@ -15,4 +15,11 @@
     <color name="itemListBackgroundSecondary">#f48fb1</color>
     <color name="itemListBackgroundPrimary">#ffffff</color>
     <color name="itemProductLowerThanMin">#ff6d6d</color>
+    <color name="errorText">#e11111</color>
+    <!-- Order State Colors-->
+    <color name="stateOpen">#30c5dc</color>
+    <color name="stateWorking">#e7d61a</color>
+    <color name="stateDone">#51e71a</color>
+    <color name="stateCancel">#e7241a</color>
+    <color name="stateWait">#1a1de7</color>
 </resources>
