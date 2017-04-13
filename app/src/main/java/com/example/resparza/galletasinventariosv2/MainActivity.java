@@ -7,12 +7,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.example.resparza.galletasinventariosv2.dbadapters.DBAdapter;
 import com.example.resparza.galletasinventariosv2.views.Main;
@@ -25,10 +29,16 @@ import java.sql.SQLException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    public static final String TAG = "MainActivity";
 
-    public static FloatingActionButton afab;
-    public static FloatingActionButton dfab;
-    public static FloatingActionButton efab;
+    private static FloatingActionButton afab;
+    private static FloatingActionButton dfab;
+    private static FloatingActionButton efab;
+    //Animations
+    private static Animation dfbOpen,efbOpen, afbOpen,fbClose;
+    private static boolean isDfabOpen = false;
+    private static boolean isEfabOpen = false;
+    private static boolean isAfabOpen = false;
     private DBAdapter db;
 
 
@@ -55,6 +65,10 @@ public class MainActivity extends AppCompatActivity
         dfab = (FloatingActionButton) findViewById(R.id.Deletefab);
         efab = (FloatingActionButton) findViewById(R.id.Editfab);
 
+        dfbOpen = AnimationUtils.loadAnimation(this,R.anim.fbshow);
+        efbOpen = AnimationUtils.loadAnimation(this,R.anim.fbshow);
+        afbOpen = AnimationUtils.loadAnimation(this,R.anim.fbshow);
+        fbClose = AnimationUtils.loadAnimation(this,R.anim.fbclose);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -156,15 +170,52 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public FloatingActionButton getAddFAB (){
-        return this.afab;
+    public static FloatingActionButton getAddFAB (){
+        return afab;
     }
 
-    public FloatingActionButton getDeleteFAB (){
-        return this.dfab;
+    public static FloatingActionButton getDeleteFAB (){
+        return dfab;
     }
 
-    public FloatingActionButton getEditFAB (){
-        return this.efab;
+    public static FloatingActionButton getEditFAB (){
+        return efab;
+    }
+    public static void openAddFAB(){
+        if (!isAfabOpen) {
+            afab.startAnimation(afbOpen);
+            isAfabOpen = !isAfabOpen;
+        }
+    }
+    public static void closeAddFAB(){
+        if (isAfabOpen) {
+            afab.startAnimation(fbClose);
+            isAfabOpen= !isAfabOpen;
+        }
+    }
+    public static void openDeleteFAB(){
+        if (!isDfabOpen) {
+            dfab.startAnimation(dfbOpen);
+            isDfabOpen = !isDfabOpen;
+        }
+    }
+    public static void closeDeleteFAB(){
+        if (isDfabOpen) {
+            dfab.startAnimation(fbClose);
+            isDfabOpen = !isDfabOpen;
+        }
+    }
+    public static void openEditFAB(){
+        if (!isEfabOpen) {
+            efab.startAnimation(efbOpen);
+            isEfabOpen = !isEfabOpen;
+        }
+    }
+    public static void closeEditFAB(){
+        if (isEfabOpen) {
+            efab.startAnimation(fbClose);
+            isEfabOpen = !isEfabOpen;
+        }
     }
 }
+

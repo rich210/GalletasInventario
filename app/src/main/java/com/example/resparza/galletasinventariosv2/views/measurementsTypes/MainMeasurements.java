@@ -1,5 +1,6 @@
 package com.example.resparza.galletasinventariosv2.views.measurementsTypes;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,8 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.CheckedTextView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -51,10 +54,14 @@ public class MainMeasurements extends Fragment implements View.OnClickListener {
     private String mParam1;
     private String mParam2;
 
+    //Layout views
     private static FloatingActionButton afab;
     private static FloatingActionButton dfab;
     private static FloatingActionButton efab;
     private RecyclerView recyclerView;
+
+    //Animations
+    private static Animation fbShow,fbClose;
 
     public static final String TAG = "MainMeasurements";
     public static final int REQUEST_CODE_ADD_MEASURE_TYPE = 10;
@@ -62,6 +69,8 @@ public class MainMeasurements extends Fragment implements View.OnClickListener {
     public static final String EXTRA_ADDED_MEASURE = "extra_key_added_measure";
     public static final String EXTRA_SELECTED_MEASURE_ID = "extra_key_selected_measure_id";
     public static final String IS_UPDATE = "isUpdate";
+    public static boolean isDfabOpen = false;
+    public static boolean isEfabOpen = false;
 
     private MeasureTypeDBAdapter measureTypeDBAdapter;
     private List<MeasureType> measureTypes;
@@ -148,15 +157,16 @@ public class MainMeasurements extends Fragment implements View.OnClickListener {
         }
 
         private void displayFloatingActionButtons(){
+            //TODO: Add a booleant to check if the button is already open and do not animate again
             int size = getSelectedIds().size();
-            if (size > 0 && size < 2){
-                efab.setVisibility(View.VISIBLE);
-                dfab.setVisibility(View.VISIBLE);
-            }else if (size >= 1){
-                efab.setVisibility(View.GONE);
+            if (size == 1){
+                MainActivity.openDeleteFAB();
+                MainActivity.openEditFAB();
+            }else if (size > 1){
+                MainActivity.closeEditFAB();
             }else {
-                efab.setVisibility(View.GONE);
-                dfab.setVisibility(View.GONE);
+                MainActivity.closeEditFAB();
+                MainActivity.closeDeleteFAB();
             }
         }
 
@@ -259,14 +269,14 @@ public class MainMeasurements extends Fragment implements View.OnClickListener {
     }
 
     private void initFloatingActionButtons(){
-        afab = ((MainActivity)getActivity()).getAddFAB();
-        afab.setVisibility(View.VISIBLE);
+        afab = MainActivity.getAddFAB();
         afab.setOnClickListener(this);
-        dfab = ((MainActivity)getActivity()).getDeleteFAB();
-        dfab.setVisibility(View.GONE);
+        MainActivity.openAddFAB();
+        dfab = MainActivity.getDeleteFAB();
         dfab.setOnClickListener(this);
-        efab = ((MainActivity)getActivity()).getEditFAB();
-        efab.setVisibility(View.GONE);
+        MainActivity.closeEditFAB();
+        efab = MainActivity.getEditFAB();
+        MainActivity.closeDeleteFAB();
         efab.setOnClickListener(this);
     }
 

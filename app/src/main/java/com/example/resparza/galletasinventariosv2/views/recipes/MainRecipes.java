@@ -128,15 +128,15 @@ public class MainRecipes extends Fragment implements View.OnClickListener {
     }
 
     private void initFloatingActionButtons(){
-        afab = ((MainActivity)getActivity()).getAddFAB();
-        afab.setVisibility(View.VISIBLE);
+        afab = MainActivity.getAddFAB();
         afab.setOnClickListener(this);
-        dfab = ((MainActivity)getActivity()).getDeleteFAB();
-        dfab.setVisibility(View.GONE);
+        dfab = MainActivity.getDeleteFAB();
         dfab.setOnClickListener(this);
-        efab = ((MainActivity)getActivity()).getEditFAB();
-        efab.setVisibility(View.VISIBLE);
+        efab = MainActivity.getEditFAB();
         efab.setOnClickListener(this);
+        MainActivity.closeDeleteFAB();
+        MainActivity.openAddFAB();
+        MainActivity.closeEditFAB();
     }
 
     @Override

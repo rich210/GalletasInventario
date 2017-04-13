@@ -127,19 +127,14 @@ public class Main extends Fragment {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        //recyclerView.setBackgroundResource(R.color.listPrimary);
         initFloatingActionButtons();
         return rootView;
     }
 
     private void initFloatingActionButtons(){
-        afab = ((MainActivity)getActivity()).getAddFAB();
-        afab.setVisibility(View.GONE);
-        //afab.setOnClickListener(this);
-        dfab = ((MainActivity)getActivity()).getDeleteFAB();
-        dfab.setVisibility(View.GONE);
-        efab = ((MainActivity)getActivity()).getEditFAB();
-        efab.setVisibility(View.GONE);
+        MainActivity.closeAddFAB();
+        MainActivity.closeEditFAB();
+        MainActivity.closeDeleteFAB();
     }
 
     @Override
@@ -147,10 +142,4 @@ public class Main extends Fragment {
         super.onResume();
         initFloatingActionButtons();
     }
-
-
-
-
-
-
 }

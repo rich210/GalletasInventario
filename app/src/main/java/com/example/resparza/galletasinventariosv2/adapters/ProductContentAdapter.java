@@ -82,14 +82,14 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
 
     public void displayFloatingActionButtons(){
         int size = getSelectedIds().size();
-        if (size > 0 && size < 2){
-            MainActivity.efab.setVisibility(View.VISIBLE);
-            MainActivity.dfab.setVisibility(View.VISIBLE);
-        }else if (size >= 1){
-            MainActivity.efab.setVisibility(View.GONE);
+        if (size == 1){
+            MainActivity.openDeleteFAB();
+            MainActivity.openEditFAB();
+        }else if (size > 1){
+            MainActivity.closeEditFAB();
         }else {
-            MainActivity.efab.setVisibility(View.GONE);
-            MainActivity.dfab.setVisibility(View.GONE);
+            MainActivity.closeDeleteFAB();
+            MainActivity.closeEditFAB();
         }
     }
 
