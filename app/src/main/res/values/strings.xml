@@ -44,7 +44,8 @@
     <string name="chooseFromGallery">Elegir desde galeria</string>
     <string name="cancel">Cancelar</string>
     <string name="chooseOption">Elegir Opciòn</string>
-
+    <string name="simbol_previous"><![CDATA[<]]></string>
+    <string name="simbol_next"><![CDATA[>]]></string>
 
 
 </resources>

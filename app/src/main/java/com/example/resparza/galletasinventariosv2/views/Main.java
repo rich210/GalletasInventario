@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
@@ -24,10 +25,17 @@ import com.example.resparza.galletasinventariosv2.dbadapters.OrderDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.ProductDBAdapter;
 import com.example.resparza.galletasinventariosv2.models.Order;
 import com.example.resparza.galletasinventariosv2.models.Product;
+import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.domain.Event;
+
+import org.w3c.dom.Text;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /*
  * A simple {@link Fragment} subclass.
@@ -52,8 +60,14 @@ public class Main extends Fragment {
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
     private FloatingActionButton efab;
+    private CompactCalendarView calendarView;
+    private Button btnNextMonth;
+    private Button btnPreviousMonth;
+    private TextView tvMonth;
 
     ProductContentAdapter adapter;
+    private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.getDefault());
+    private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
 
 
     public Main() {
@@ -93,7 +107,11 @@ public class Main extends Fragment {
         // Inflate the layout for this fragment
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        CalendarView calendarView = (CalendarView) rootView.findViewById(R.id.calendarView);
+        calendarView = (CompactCalendarView) rootView.findViewById(R.id.compactcalendar_view);
+        tvMonth = (TextView)rootView.findViewById(R.id.txtMonth);
+        btnNextMonth = (Button)rootView.findViewById(R.id.btnNext);
+        btnPreviousMonth = (Button)rootView.findViewById(R.id.btnPrevious);
+        tvMonth.setText(dateFormatForMonth.format(calendarView.getFirstDayOfCurrentMonth()));
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
         ProductDBAdapter productDBAdapter = new ProductDBAdapter(recyclerView.getContext());
         List<Product> products = null;
@@ -128,6 +146,43 @@ public class Main extends Fragment {
             e.printStackTrace();
         }
         initFloatingActionButtons();
+
+        calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
+            @Override
+            public void onDayClick(Date dateClicked) {
+                tvMonth.setText(dateFormatForMonth.format(dateClicked));
+                //List<Event> bookingsFromMap = calendarView.getEvents(dateClicked);
+                Log.d(TAG, "inside onclick " + dateFormatForDisplaying.format(dateClicked));
+                /*if (bookingsFromMap != null) {
+                    Log.d(TAG, bookingsFromMap.toString());
+                    mutableBookings.clear();
+                    for (Event booking : bookingsFromMap) {
+                        mutableBookings.add((String) booking.getData());
+                    }
+                    adapter.notifyDataSetChanged();
+                }*/
+
+            }
+
+            @Override
+            public void onMonthScroll(Date firstDayOfNewMonth) {
+                tvMonth.setText(dateFormatForMonth.format(firstDayOfNewMonth));
+            }
+        });
+
+        btnPreviousMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendarView.showPreviousMonth();
+            }
+        });
+
+        btnNextMonth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendarView.showNextMonth();
+            }
+        });
         return rootView;
     }
 
