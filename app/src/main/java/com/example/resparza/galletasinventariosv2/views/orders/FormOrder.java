@@ -194,7 +194,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
             orderId = Long.valueOf((this.tvOrderId.getText().toString().isEmpty())?"0": this.tvOrderId.getText().toString());
             clientName = this.etClientName.getText().toString();
             day = this.dpDeliveryDate.getDayOfMonth();
-            month = this.dpDeliveryDate.getMonth() + 1;
+            month = this.dpDeliveryDate.getMonth();
             year = this.dpDeliveryDate.getYear();
             calendar.set(year,month,day);
             deliveryDate = calendar.getTime();

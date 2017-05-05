@@ -64,6 +64,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
         holder.tvDeliveryDate.setText(order.getFormatedDelivaryDate());
         holder.tvOrderState.setText(order.getOrderStatus());
         holder.tvOrderState.setBackgroundResource(R.drawable.background_round_corner);
+        holder.orderCardView.setCardBackgroundColor(order.getColorStatus());
         GradientDrawable drawable = (GradientDrawable)holder.tvOrderState.getBackground();
         switch (holder.tvOrderState.getText().toString()){
             case "Abierto":
@@ -98,10 +99,11 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
                         RecyclerView rv = (RecyclerView)v.getParent();
                         toggleSelection(position);
                         if(isToggleSelection(position)){
-                        cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
+                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
 
                         }else{
-                        cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
+                            cv.setCardBackgroundColor(order.getColorStatus());
+                        //cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
 
                         }
 

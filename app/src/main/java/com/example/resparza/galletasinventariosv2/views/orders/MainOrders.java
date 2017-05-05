@@ -98,13 +98,13 @@ public class MainOrders extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         recyclerView = (RecyclerView) inflater.inflate(
                 R.layout.recycler_view, container, false);
-        List<Order> recipes = getOrders();
-        if (recipes == null || recipes.isEmpty()){
+        List<Order> orders = getOrders();
+        if (orders == null || orders.isEmpty()){
             Intent intent = new Intent(getActivity(), FormOrder.class);
             intent.putExtra(IS_UPDATE,false);
             startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
         }
-        adapter = new OrderContentAdapter(recyclerView.getContext(),recipes);
+        adapter = new OrderContentAdapter(recyclerView.getContext(),orders);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -162,6 +162,7 @@ public class MainOrders extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.Deletefab:
+                //TODO: Add dialog to delete
                 //showDeleteDialogConfirmation();
                 /*
                 selected = mAdapter.getSelectedIds();

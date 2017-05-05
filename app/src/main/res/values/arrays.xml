@@ -27,6 +27,5 @@
         <item>Entregado</item>
         <item>Cancelado</item>
         <item>Espera confirmacion</item>
-        <item>Espera</item>
     </string-array>
 </resources>

@@ -1,12 +1,14 @@
 package com.example.resparza.galletasinventariosv2.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -25,13 +27,16 @@ import com.example.resparza.galletasinventariosv2.dbadapters.OrderDBAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.ProductDBAdapter;
 import com.example.resparza.galletasinventariosv2.models.Order;
 import com.example.resparza.galletasinventariosv2.models.Product;
+import com.example.resparza.galletasinventariosv2.views.orders.FormOrder;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
+import com.github.sundeepk.compactcalendarview.EventsContainer;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 
 import org.w3c.dom.Text;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -57,6 +62,12 @@ public class Main extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    public static final int REQUEST_CODE_ADD_ORDER = 10;
+    public static final int REQUEST_CODE_MODIFY_ORDER = 20;
+    public static final String EXTRA_ADDED_ORDER = "extra_key_added_order";
+    public static final String EXTRA_SELECTED_ORDER_ID = "extra_key_selected_order_id";
+    public static final String IS_UPDATE = "isUpdate";
+
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
     private FloatingActionButton efab;
@@ -68,6 +79,9 @@ public class Main extends Fragment {
     ProductContentAdapter adapter;
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
+    private String[] dayColumnNames = {"Lun","Mar","Mie","Jue","Vie","Sab","Dom"};
+
+
 
 
     public Main() {
@@ -133,40 +147,35 @@ public class Main extends Fragment {
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setFocusable(false);
 
-        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
-        List<Order> orders = null;
-        try {
-            orderDBAdapter.open();
-            orders = orderDBAdapter.getAllItemsByDate(Calendar.getInstance().getTime());
-            orderDBAdapter.close();
-            for (Order order:orders) {
 
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         initFloatingActionButtons();
-
+        //calendarView.setUseThreeLetterAbbreviation(true);
+        calendarView.setEventIndicatorStyle(CompactCalendarView.FILL_LARGE_INDICATOR);
+        calendarView.setDayColumnNames(dayColumnNames);
+        calendarView.addEvents(getEvents(recyclerView.getContext(),Calendar.getInstance().getTime()));
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
+                //TODO: Redirect to order form when the event is clicked
+                Intent intent = new Intent(getActivity(), FormOrder.class);
+                List<Event> events = calendarView.getEvents(dateClicked);
+                if(events.size()== 1){
+                    Event event = events.get(0);
+                    long id = ((Order)event.getData()).getOrderId();
+                    intent.putExtra(IS_UPDATE,true);
+                    intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
+                    startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
+                }else
+                //TODO: Check if only one event per day if no display a pop up to choose one
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));
-                //List<Event> bookingsFromMap = calendarView.getEvents(dateClicked);
-                Log.d(TAG, "inside onclick " + dateFormatForDisplaying.format(dateClicked));
-                /*if (bookingsFromMap != null) {
-                    Log.d(TAG, bookingsFromMap.toString());
-                    mutableBookings.clear();
-                    for (Event booking : bookingsFromMap) {
-                        mutableBookings.add((String) booking.getData());
-                    }
-                    adapter.notifyDataSetChanged();
-                }*/
-
+                Log.d(TAG, "inside onclick " + dateFormatForDisplaying.format(dateClicked) + calendarView.getEvents(dateClicked));
             }
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
                 tvMonth.setText(dateFormatForMonth.format(firstDayOfNewMonth));
+                calendarView.removeAllEvents();
+                calendarView.addEvents(getEvents(getContext(),firstDayOfNewMonth));
             }
         });
 
@@ -196,5 +205,24 @@ public class Main extends Fragment {
     public void onResume() {
         super.onResume();
         initFloatingActionButtons();
+    }
+
+    public List<Event> getEvents(Context context, Date date){
+        List<Event> events = new ArrayList<Event>();
+        List<Order> orders = null;
+        OrderDBAdapter orderDBAdapter = new OrderDBAdapter(context);
+        int eventColor = ResourcesCompat.getColor(getResources(),R.color.colorAccent,null);
+        try {
+            orderDBAdapter.open();
+            orders = orderDBAdapter.getAllItemsByDate(date);
+            orderDBAdapter.close();
+            for (Order order:orders) {
+                Event event = new Event(order.getColorStatus(),order.getDeliveryDate().getTime(),order);
+                events.add(event);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return events;
     }
 }

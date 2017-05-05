@@ -19,6 +19,7 @@ public class Order {
     private double sellPrice;
     private double gain;
     private String orderStatus;
+    private int colorStatus;
 
     public Order() {
     }
@@ -141,6 +142,14 @@ public class Order {
         return recipeNames.toString();
     }
 
+    public int getColorStatus() {
+        return colorStatus;
+    }
+
+    public void setColorStatus(int colorStatus) {
+        this.colorStatus = colorStatus;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -154,6 +163,7 @@ public class Order {
                 ", sellPrice=" + sellPrice +
                 ", gain=" + gain +
                 ", orderStatus='" + orderStatus + '\'' +
+                ", colorStatus=" + colorStatus +
                 '}';
     }
 }

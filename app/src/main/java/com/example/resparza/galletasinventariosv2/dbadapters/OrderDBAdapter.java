@@ -5,9 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 
 
+import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.models.Order;
 import com.example.resparza.galletasinventariosv2.models.OrderRecipe;
 
@@ -130,6 +132,7 @@ public class OrderDBAdapter {
     public List<Order> getAllItemsByDate(Date date) {
         List<Order> orders = new ArrayList<Order>();
         Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
         calendar.set(Calendar.DAY_OF_MONTH,1);
         String firstDayOfMonth = sdf.format(calendar.getTime());
         calendar.set(Calendar.DAY_OF_MONTH,calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
@@ -219,6 +222,7 @@ public class OrderDBAdapter {
     }
 
     private Order cursorToItem(Cursor c) {
+        String[] strings = mCtx.getResources().getStringArray(R.array.orderStates);
         OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         Order order = new Order();
         order.setOrderId(c.getInt(c.getColumnIndex(ORDER_ID)));
@@ -233,6 +237,20 @@ public class OrderDBAdapter {
         order.setTotal(c.getFloat(c.getColumnIndex(TOTAL)));
         order.setSellPrice(c.getFloat(c.getColumnIndex(SELL_PRICE)));
         order.setOrderStatus(c.getString(c.getColumnIndex(ORDER_STATUS)));
+        //TODO: Add colors to the background
+        if(order.getOrderStatus().equals(strings[1])){ //Open State
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateOpen, null));
+        }else if (order.getOrderStatus().equals(strings[2])){ //Working State
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateWorking, null));
+        }else if (order.getOrderStatus().equals(strings[3])){ //Done State
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateDone, null));
+        }else if (order.getOrderStatus().equals(strings[4])){ //Cancel State
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateCancel, null));
+        }else if (order.getOrderStatus().equals(strings[5])){ //Wait State
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateWait, null));
+        }else{ //Default
+            order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.itemListBackgroundPrimary, null));
+        }
         try {
             orderRecipeDBAdapter.open();
             List<OrderRecipe> orderRecipes = orderRecipeDBAdapter.getItemsByOrderId(order.getOrderId());
