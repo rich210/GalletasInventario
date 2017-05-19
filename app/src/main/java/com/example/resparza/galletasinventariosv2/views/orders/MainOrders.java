@@ -1,12 +1,14 @@
 package com.example.resparza.galletasinventariosv2.views.orders;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -163,25 +165,7 @@ public class MainOrders extends Fragment implements View.OnClickListener {
                 break;
             case R.id.Deletefab:
                 //TODO: Add dialog to delete
-                //showDeleteDialogConfirmation();
-                /*
-                selected = mAdapter.getSelectedIds();
-                size = (short) selected.size();
-                long ids[] = new long[size];
-                for (int i = 0; i < size; i++) {
-                    if (selected.valueAt(i)) {
-                        selectedId = mAdapter.getItemId(selected.keyAt(i));
-                        ids[i] = selectedId;
-                    }
-                }
-                if (productDBAdapter.deleteItemsByIds(ids)) {
-                    Log.d(TAG, "Deleted " + size + " products");
-                    Toast.makeText(ProductMainActivity.this, "Deleted " + size + " products", Toast.LENGTH_SHORT).show();
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Error trying to delete products");
-                    Toast.makeText(ProductMainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-                }*/
+                showDeleteDialogConfirmation();
                 break;
 
             default:
@@ -205,6 +189,60 @@ public class MainOrders extends Fragment implements View.OnClickListener {
         }
 
         return orders;
+    }
+
+    private void showDeleteDialogConfirmation() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
+
+        alertDialogBuilder.setTitle(getString(R.string.dialogDeleteTitle));
+        alertDialogBuilder
+                .setMessage(getString(R.string.orderDiaglogConfirmationText));
+
+        // set positive button YES message
+        alertDialogBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // delete the employee and refresh the list
+                Long selectedId;
+                short size;
+                SparseBooleanArray selected;
+                OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
+                selected = adapter.getSelectedIds();
+                size = (short) selected.size();
+                long ids[] = new long[size];
+                for (int i = 0 ; i<(size); i++){
+                    if (selected.valueAt(i)){
+                        selectedId = adapter.getItemId(selected.keyAt(i));
+                        adapter.toggleSelection(selected.keyAt(i));
+                        ids[i] = selectedId;
+                    }
+                }
+                if (orderDBAdapter.deleteItemsByIds(ids)) {
+                    Toast.makeText(recyclerView.getContext(), "Deleted " +size +" orders", Toast.LENGTH_SHORT).show();
+                    adapter.notifyDataSetChanged();
+                    onResume();
+                }else{
+                    Log.d(TAG, "Error trying to delete orders");
+                    Toast.makeText(recyclerView.getContext(), getText(R.string.deleteErrorText), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        // set neutral button OK
+        alertDialogBuilder.setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show alert
+        alertDialog.show();
     }
 
 }

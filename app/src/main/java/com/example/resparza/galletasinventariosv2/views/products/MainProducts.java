@@ -215,9 +215,9 @@ public class MainProducts extends Fragment implements View.OnClickListener {
     private void showDeleteDialogConfirmation() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
 
-        alertDialogBuilder.setTitle("Delete");
+        alertDialogBuilder.setTitle(getString(R.string.dialogDeleteTitle));
         alertDialogBuilder
-                .setMessage("Are you sure you want to delete the measure type(s)");
+                .setMessage(getString(R.string.productDiaglogConfirmationText));
 
         // set positive button YES message
         alertDialogBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -245,7 +245,7 @@ public class MainProducts extends Fragment implements View.OnClickListener {
                     onResume();
                 }else{
                     Log.d(TAG, "Error trying to delete product");
-                    Toast.makeText(recyclerView.getContext(), "Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(recyclerView.getContext(), getText(R.string.deleteErrorText), Toast.LENGTH_SHORT).show();
                 }
 
             }

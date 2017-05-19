@@ -1,6 +1,7 @@
 package com.example.resparza.galletasinventariosv2.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckedTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
@@ -71,6 +74,7 @@ public class Main extends Fragment {
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
     private FloatingActionButton efab;
+    RecyclerView recyclerView;
     private CompactCalendarView calendarView;
     private Button btnNextMonth;
     private Button btnPreviousMonth;
@@ -126,7 +130,7 @@ public class Main extends Fragment {
         btnNextMonth = (Button)rootView.findViewById(R.id.btnNext);
         btnPreviousMonth = (Button)rootView.findViewById(R.id.btnPrevious);
         tvMonth.setText(dateFormatForMonth.format(calendarView.getFirstDayOfCurrentMonth()));
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
         ProductDBAdapter productDBAdapter = new ProductDBAdapter(recyclerView.getContext());
         List<Product> products = null;
         try {
@@ -153,6 +157,7 @@ public class Main extends Fragment {
         calendarView.setEventIndicatorStyle(CompactCalendarView.FILL_LARGE_INDICATOR);
         calendarView.setDayColumnNames(dayColumnNames);
         calendarView.addEvents(getEvents(recyclerView.getContext(),Calendar.getInstance().getTime()));
+        calendarView.setBackgroundColor(ResourcesCompat.getColor(getResources(),R.color.listBackground,null));
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
@@ -165,7 +170,9 @@ public class Main extends Fragment {
                     intent.putExtra(IS_UPDATE,true);
                     intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
                     startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
-                }else
+                }else{
+                    showDeleteDialogConfirmation(events);
+                }
                 //TODO: Check if only one event per day if no display a pop up to choose one
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));
                 Log.d(TAG, "inside onclick " + dateFormatForDisplaying.format(dateClicked) + calendarView.getEvents(dateClicked));
@@ -224,5 +231,74 @@ public class Main extends Fragment {
             e.printStackTrace();
         }
         return events;
+    }
+    private void showDeleteDialogConfirmation(final List<Event> events) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
+        List<String> strings = new ArrayList<String>();
+        for (Event e:events) {
+            strings.add(((Order)e.getData()).getNameAndDate());
+        }
+
+        alertDialogBuilder.setTitle(R.string.mainSelectOrder);
+//        alertDialogBuilder
+//                .setMessage(getString(R.string.orderDiaglogConfirmationText));
+        alertDialogBuilder.setItems(strings.toArray(new String[strings.size()]), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(getActivity(), FormOrder.class);
+                Event event = events.get(which);
+                long id = ((Order)event.getData()).getOrderId();
+                intent.putExtra(IS_UPDATE,true);
+                intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
+                startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
+            }
+        });
+
+
+        // set positive button YES message
+//        alertDialogBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                // delete the employee and refresh the list
+////                Long selectedId;
+////                short size;
+////                SparseBooleanArray selected;
+////                OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
+////                selected = adapter.getSelectedIds();
+////                size = (short) selected.size();
+////                long ids[] = new long[size];
+////                for (int i = 0 ; i<(size); i++){
+////                    if (selected.valueAt(i)){
+////                        selectedId = adapter.getItemId(selected.keyAt(i));
+////                        adapter.toggleSelection(selected.keyAt(i));
+////                        ids[i] = selectedId;
+////                    }
+////                }
+////                if (orderDBAdapter.deleteItemsByIds(ids)) {
+////                    Toast.makeText(recyclerView.getContext(), "Deleted " +size +" orders", Toast.LENGTH_SHORT).show();
+////                    adapter.notifyDataSetChanged();
+////                    onResume();
+////                }else{
+////                    Log.d(TAG, "Error trying to delete orders");
+////                    Toast.makeText(recyclerView.getContext(), getText(R.string.deleteErrorText), Toast.LENGTH_SHORT).show();
+////                }
+//
+//            }
+//        });
+
+        // set neutral button OK
+        alertDialogBuilder.setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show alert
+        alertDialog.show();
     }
 }

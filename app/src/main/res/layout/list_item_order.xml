@@ -41,6 +41,16 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="2dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:id="@+id/lineBackgroundState"
+            android:layout_below="@id/txtClientName"
+            android:orientation="horizontal"
+            android:layout_marginTop="3dp"
+            android:layout_marginRight="20dp" />
+
         <TextView
             android:id="@+id/txtRecipes"
             android:layout_width="wrap_content"
@@ -54,7 +64,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="2dp"
-            android:layout_below="@id/txtClientName"
+            android:layout_below="@id/lineBackgroundState"
             android:visibility="gone"
             android:background="@drawable/primary_round_corner"/>
         <TextView
@@ -72,16 +82,25 @@
             android:layout_below="@id/txtRecipes"
             android:layout_alignParentLeft="true"/>
 
-        <TextView
-            android:id="@+id/txtOrderState"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Estado de la orden"
-            android:textSize="15dp"
-            android:padding="3dp"
-            android:layout_below="@id/txtRecipes"
-            android:layout_marginTop="8dp"
+        <ImageView
+            android:id="@+id/ivOrderState"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginRight="5dp"
+            android:paddingTop="12dp"
+            android:paddingRight="3dp"
+            android:paddingLeft="3dp"
+            android:paddingBottom="3dp"
+            android:layout_marginTop="2dp"
+
+
+            android:layout_below="@id/txtClientName"
+            android:layout_alignEnd="@id/lineBackgroundState"
             android:layout_alignParentRight="true"/>
+
+        <!--android:text="Estado de la orden"-->
+        <!--android:textSize="15dp"-->
+        <!--android:textAlignment="center"-->
 
 
     </RelativeLayout>

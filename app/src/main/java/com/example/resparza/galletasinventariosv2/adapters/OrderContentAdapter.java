@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
@@ -52,7 +53,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
 
         //holder.imageRecipe.setImageDrawable(mRecipePictures[1]);
         if(order == null){
-        Log.d(TAG, order.toString());
+        Log.d(TAG, "Error the order is null");
         }
 
         holder.tvOrderNO.setText(String.valueOf(order.getOrderId()));
@@ -62,26 +63,24 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
             holder.tvClientName.setText(order.getOrderName());
         }
         holder.tvDeliveryDate.setText(order.getFormatedDelivaryDate());
-        holder.tvOrderState.setText(order.getOrderStatus());
-        holder.tvOrderState.setBackgroundResource(R.drawable.background_round_corner);
-        holder.orderCardView.setCardBackgroundColor(order.getColorStatus());
-        GradientDrawable drawable = (GradientDrawable)holder.tvOrderState.getBackground();
-        switch (holder.tvOrderState.getText().toString()){
+//        holder.tvOrderState.setText(order.getOrderStatus());
+        holder.stateBackground.setBackgroundColor(order.getColorStatus());
+//        GradientDrawable drawable = (GradientDrawable)holder.tvOrderState.getBackground();
+        switch (order.getOrderStatus()){
             case "Abierto":
-                drawable.setColor(Color.alpha(R.color.stateOpen));
-                Log.d(TAG, "onBindViewHolder: Enter case abierto");
+                holder.ivOrderState.setBackgroundResource(R.drawable.bg_round_corner_open);
                 break;
             case "Trabajando":
-                drawable.setColor(Color.alpha(R.color.stateWorking));
+                holder.ivOrderState.setBackgroundResource(R.drawable.bg_round_corner_work);
                 break;
             case "Entregado":
-                drawable.setColor(Color.alpha(R.color.stateDone));
+                holder.ivOrderState.setBackgroundResource(R.drawable.bg_round_corner_done);
                 break;
             case "Cancelado":
-                drawable.setColor(Color.alpha(R.color.stateCancel));
+                holder.ivOrderState.setBackgroundResource(R.drawable.bg_round_corner_cancel);
                 break;
             case "Espera confirmacion":
-                drawable.setColor(Color.alpha(R.color.stateWait));
+                holder.ivOrderState.setBackgroundResource(R.drawable.bg_round_corner_wait);
                 break;
         }
         holder.tvRecipeName.setText(order.getRecipes());
@@ -102,8 +101,8 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
                             cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
 
                         }else{
-                            cv.setCardBackgroundColor(order.getColorStatus());
-                        //cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
+//                            cv.setCardBackgroundColor(order.getColorStatus());
+                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
 
                         }
 
@@ -158,10 +157,11 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CardView orderCardView;
+        public LinearLayout stateBackground;
         public TextView tvOrderNO;
         public TextView tvClientName;
         public TextView tvDeliveryDate;
-        public TextView tvOrderState;
+        public ImageView ivOrderState;
         public TextView tvRecipeName;
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.list_item_order, parent, false));
@@ -169,8 +169,9 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
             tvOrderNO = (TextView) itemView.findViewById(R.id.txtOrderNo);
             tvClientName = (TextView)itemView.findViewById(R.id.txtClientName);
             tvDeliveryDate = (TextView)itemView.findViewById(R.id.txtDeliveryDate);
-            tvOrderState = (TextView)itemView.findViewById(R.id.txtOrderState);
+            ivOrderState = (ImageView) itemView.findViewById(R.id.ivOrderState);
             tvRecipeName = (TextView)itemView.findViewById(R.id.txtRecipes);
+            stateBackground = (LinearLayout)itemView.findViewById(R.id.lineBackgroundState);
         }
     }
 

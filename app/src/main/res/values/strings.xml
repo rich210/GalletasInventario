@@ -12,19 +12,23 @@
     <string name="deleteErrorText">Error tratando de eliminar</string>
 
     <string name="dialogDeleteTitle">Eliminar</string>
-
+    <!--Main Measurement Text-->
+    <string name="measurementDiaglogConfirmationText">¿Seguro quieres eliminar la medida(s)?</string>
+    <string name="measurementMultipleSelectionErrorText">Error: Mas de una medida a sido seleccionada</string>
     <!-- Measurement Form Text  -->
     <string name="measurementFormAddTitle">Añadir medida</string>
     <string name="measurementFormUpdateTitle">Modificar medida</string>
     <string name="measurementFormSpinnerErrorText">Selecione un tipo de medida</string>
 
-
+    <!--Main Product Text-->
+    <string name="productDiaglogConfirmationText">¿Seguro quieres eliminar el producto(s)?</string>
+    <string name="productMultipleSelectionErrorText">Error: Mas de un producto a sido seleccionad</string>
     <!-- Product Form Text  -->
     <string name="productFormAddTitle">Añadir producto</string>
     <string name="productFormUpdateTitle">Modificar producto</string>
 
     <!--Main Recipe Form Texts-->
-    <string name="recipeDiaglogConfirmationText">¿Seguro quieres eliminar la receta?</string>
+    <string name="recipeDiaglogConfirmationText">¿Seguro quieres eliminar la(s) receta(s)?</string>
     <string name="recipeMultipleSelectionErrorText">Error: Mas de una receta a sido seleccionada</string>
     <!-- Recipe Form Text  -->
     <string name="recipeFormAddTitle">Añadir receta</string>
@@ -32,7 +36,9 @@
     <string name="errorRecipeProductsForm">Los productos no son validos</string>
     <string name="errorRecipeForm">Porfavor verifique que todo los datos esten correctos.</string>
     <string name="recipeFormQuantity">Cantidad</string>
-
+    <!--Main Order Text-->
+    <string name="orderDiaglogConfirmationText">¿Seguro quieres eliminar la(s) orden(es)?</string>
+    <string name="ordenMultipleSelectionErrorText">Error: Mas de una orden a sido seleccionada</string>
     <!-- Order Form Text  -->
     <string name="ordenFormAddTitle">Añadir orden</string>
     <string name="ordenFormUpdateTitle">Modificar orden</string>
@@ -46,6 +52,7 @@
     <string name="chooseOption">Elegir Opciòn</string>
     <string name="simbol_previous"><![CDATA[<]]></string>
     <string name="simbol_next"><![CDATA[>]]></string>
+    <string name="mainSelectOrder">Seleccione la orden</string>
 
 
 </resources>

@@ -166,4 +166,8 @@ public class Order {
                 ", colorStatus=" + colorStatus +
                 '}';
     }
+
+    public String getNameAndDate(){
+        return clientName + " " + getFormatedDelivaryDate();
+    }
 }

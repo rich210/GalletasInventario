@@ -60,6 +60,7 @@ public class RecipeDBAdapter {
     }
 
     public long insertItem(Recipe recipe, List<RecipeProduct> recipeProductList) throws SQLException {
+        //TODO: Add transaction
         ContentValues initialValues = itemToValues(recipe, false);
         long recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
         RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
@@ -82,6 +83,7 @@ public class RecipeDBAdapter {
     }
 
     public boolean deleteItemsByIds(long recipeIds[]) {
+        //TODO: Add transaction
         RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
         boolean isDeleted = true;
         StringBuilder whereClause = new StringBuilder();
@@ -149,7 +151,7 @@ public class RecipeDBAdapter {
     }
 
     public boolean updateItem(Recipe recipe, List<RecipeProduct> recipeProducts) throws SQLException {
-
+        //TODO: Add transaction
         ContentValues values = itemToValues(recipe, true);
         boolean isRecipeUpdated = this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
         if (isRecipeUpdated){

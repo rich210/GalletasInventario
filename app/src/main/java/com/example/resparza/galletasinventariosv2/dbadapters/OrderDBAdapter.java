@@ -92,8 +92,9 @@ public class OrderDBAdapter {
 
         return this.mDb.delete(ORDER_TABLE, ORDER_ID + "=" + orderId, null) > 0; //$NON-NLS-1$
     }
-
+    //TODO: Add function to set to cancel beside delete
     public boolean deleteItemsByIds(long orderIds[]) {
+        //TODO: Add transaction and logic to delete orders recipes
         StringBuilder whereClause = new StringBuilder();
         whereClause.append(ORDER_ID + " IN (");
         for (int i = 0; i <= orderIds.length; i++) {
@@ -170,6 +171,7 @@ public class OrderDBAdapter {
     }
 
     public boolean updateItem(Order order) {
+        //TODO: Add transaction
         boolean isOrderUpdated =true;
         OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         ContentValues values = itemToValues(order, true);
