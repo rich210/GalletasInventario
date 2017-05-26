@@ -21,7 +21,7 @@ public class DBAdapter {
     public static final String DATABASE_NAME = "cookieManager"; //$NON-NLS-1$
     public static final String TAG = "DBAdapter";
 
-    public static final int DATABASE_VERSION = 4; //TODO: Update database to insert column in recipe table
+    public static final int DATABASE_VERSION = 5; //TODO: Update database to insert column in recipe table
 
 
     private static final String CREATE_TABLE_TBL_PRODUCTS =
@@ -97,6 +97,39 @@ public class DBAdapter {
                     + "FOREIGN KEY (" + RecipeProductDBAdapter.MEASUREMENT_TYPE_ID + ") REFERENCES "+MeasureTypeDBAdapter.MEASURE_TABLE+"("+MeasureTypeDBAdapter.MEASURE_TYPE_ID+"),"
                     + "FOREIGN KEY (" + RecipeProductDBAdapter.RECIPE_ID + ") REFERENCES "+RecipeDBAdapter.RECIPE_TABLE+"("+RecipeDBAdapter.RECIPE_ID+"));";
 
+    private static final String CREATE_VIEW_PRODUCT_NEEDED =
+            "CREATE VIEW view_product_needed AS " +
+                    "SELECT t1.*," +
+                    "SUM(t4."+OrderRecipeDBAdapter.ORDER_QUANTITY+" * t2."+ RecipeProductDBAdapter.PRODUCT_QUANTITY+") as product_needed " +
+                    "FROM "+ ProductDBAdapter.PRODUCT_TABLE +" t1 " +
+                    "JOIN "+ RecipeProductDBAdapter.RECIPE_PRODUCT_TABLE +" t2 on t1.product_id = t2.product_id " +
+                    "JOIN "+ RecipeDBAdapter.RECIPE_TABLE +" t3 on t2.recipe_id = t3.recipe_id " +
+                    "JOIN "+ OrderRecipeDBAdapter.ORDER_RECIPE_TABLE +" t4 on t2.recipe_id = t4.recipe_id " +
+                    "JOIN "+ OrderDBAdapter.ORDER_TABLE +" t5 on t4.order_id = t5.order_id " +
+                    "WHERE t5."+ OrderDBAdapter.DELIVERY_DATE+" > DATE('now') " +
+                    "AND (t4."+OrderRecipeDBAdapter.ORDER_QUANTITY+" * t2."+ RecipeProductDBAdapter.PRODUCT_QUANTITY+") > t1."+ ProductDBAdapter.QUANTITY + " "+
+                    "GROUP BY 1,2,3,4,5,7,8 " +
+                    "UNION " +
+                    "SELECT t1.*, " +
+                    "0 AS product_needed " +
+                    "FROM "+ ProductDBAdapter.PRODUCT_TABLE +" t1 " +
+                    "WHERE t1."+ ProductDBAdapter.QUANTITY +" < t1."+ ProductDBAdapter.PRODUCT_MIN;
+
+    //TODO: Add other view for products and formated
+    private static final String CREATE_VIEW_PRODUCT_USED =
+            "CREATE VIEW view_product_used AS" +
+            "SELECT t1.*," +
+            "(t4."+OrderRecipeDBAdapter.ORDER_QUANTITY+" * t2."+ RecipeProductDBAdapter.PRODUCT_QUANTITY+") AS product_used, " +
+            "t4."+ OrderRecipeDBAdapter.ORDER_ID+" " +
+            "FROM "+ ProductDBAdapter.PRODUCT_TABLE +" t1 " +
+            "JOIN "+ RecipeProductDBAdapter.RECIPE_PRODUCT_TABLE +" t2 ON t1.product_id = t2.product_id " +
+            "JOIN "+ RecipeDBAdapter.RECIPE_TABLE +" t3 ON t2.recipe_id = t3.recipe_id " +
+            "JOIN "+ OrderRecipeDBAdapter.ORDER_RECIPE_TABLE +" t4 ON t2.recipe_id = t4.recipe_id " +
+            "JOIN "+ OrderDBAdapter.ORDER_TABLE +" t5 ON t4.order_id = t5.order_id " +
+            "WHERE t5."+ OrderDBAdapter.DELIVERY_DATE+" > date('now') " +
+            "GROUP BY t1.product_id,t1.product_name,t1.measure_type_id,t1.quantity,t1.cost_per_unit,t1.product_min,t1.created,t1.updated,t4.order_id";
+
+
 
     private final Context context;
     private DatabaseHelper DBHelper;
@@ -152,6 +185,8 @@ public class DBAdapter {
             db.execSQL(CREATE_TABLE_TBL_PRODUCTS);
             db.execSQL(CREATE_TABLE_TBL_ORDER_RECIPE);
             db.execSQL(CREATE_TABLE_TBL_RECIPE_PRODUCT);
+            db.execSQL(CREATE_VIEW_PRODUCT_NEEDED);
+            db.execSQL(CREATE_VIEW_PRODUCT_USED);
 
             //Inser default values for measure table
             db.execSQL("insert into "+MeasureTypeDBAdapter.MEASURE_TABLE + "("
@@ -230,6 +265,8 @@ public class DBAdapter {
             db.execSQL("drop table if exists "+ ProductDBAdapter.PRODUCT_TABLE);
             db.execSQL("drop table if exists "+ OrderRecipeDBAdapter.ORDER_RECIPE_TABLE);
             db.execSQL("drop table if exists "+ RecipeProductDBAdapter.RECIPE_PRODUCT_TABLE);
+            db.execSQL("drop table if exists view_product_needed");
+            db.execSQL("drop table if exists view_product_used");
 
             onCreate(db);
             // Adding any table mods to this guy here

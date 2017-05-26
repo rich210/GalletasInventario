@@ -31,6 +31,7 @@ public class ProductDBAdapter {
     public static final String PRODUCT_MIN = "product_min";
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";
+    public static final String PRODUCT_NEEDED = "product_needed";
 
     public static final String PRODUCT_TABLE = "tbl_products";
     private final Context mCtx;
@@ -125,6 +126,24 @@ public class ProductDBAdapter {
         return products;
     }
 
+    public List<Product> getAllProductNeededForOrder() {
+        List<Product> products = new ArrayList<Product>();
+        String selectQuery = "SELECT  * FROM view_product_needed limit 20";
+
+        //Log.e(LOG, selectQuery);
+
+        Cursor c = this.mDb.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (c.moveToFirst()) {
+            do {
+                Product prod = cursorToItem(c);
+                products.add(prod);
+            } while (c.moveToNext());
+        }
+        return products;
+    }
+
     public Product getItemById(long productId) throws SQLException {
 
         String selectQuery = "SELECT  * FROM " + PRODUCT_TABLE + " WHERE "
@@ -181,6 +200,11 @@ public class ProductDBAdapter {
                 prod.setMeasureType(measureType);
         } catch (SQLException e) {
             Log.d(TAG, "Error trying to retrieve measure type for : " + prod.getProductName() + " " + prod.getProductId());
+        }
+        if(cursor.getColumnIndex(PRODUCT_NEEDED) != -1){
+            prod.setProductNeeded(cursor.getFloat(cursor.getColumnIndex(PRODUCT_NEEDED)));
+        }else{
+            prod.setProductNeeded(0);
         }
         prod.setLowerThanMin(cursor.getInt(cursor.getColumnIndex(QUANTITY)),cursor.getFloat(cursor.getColumnIndex(PRODUCT_MIN)));
         return prod;

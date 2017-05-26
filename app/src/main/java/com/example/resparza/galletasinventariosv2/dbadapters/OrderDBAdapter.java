@@ -188,6 +188,26 @@ public class OrderDBAdapter {
                             throw new RuntimeException("Error updating order recipe");
                         }
                     }
+
+//                    this.mDb.execSQL("update tbl_products set quantity = (select tbl_products.quantity - t2.product_used" +
+//                            "                                                        from view_product_used t2" +
+//                            "                                                        where tbl_products.product_id = t2.product_id" +
+//                            "                                                        and t2.order_id = ?)" +
+//                            "                    where product_id in (select product_id" +
+//                            "                                                        from view_product_used t2" +
+//                            "                                                        where tbl_products.product_id = t2.product_id" +
+//                            "                                                        and t2.order_id = ?)", order.getOrderId());
+                    //TODO: Add query to update the producte when the order is completed
+                    /*
+                    update tbl_products set quantity = (select tbl_products.quantity - t2.product_used
+                                                        from view_product_used t2
+                                                        where tbl_products.product_id = t2.product_id
+                                                        and t2.order_id = 2)
+                    where product_id in (select product_id
+                                                        from view_product_used t2
+                                                        where tbl_products.product_id = t2.product_id
+                                                        and t2.order_id = 2)
+                     */
                     this.mDb.setTransactionSuccessful();
                 } catch (Exception e) {
                     isOrderUpdated = false;

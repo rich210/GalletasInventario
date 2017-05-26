@@ -15,6 +15,7 @@ public class Product {
     private boolean isLowerThanMin;
     private float costPerUnit;
     private float totalCost;
+    private float productNeeded;
 
     public Product() {
 
@@ -131,4 +132,22 @@ public class Product {
         this.productMin = productMin;
     }
 
+    public float getProductNeeded() {
+        return productNeeded;
+    }
+
+    public void setProductNeeded(float productNeeded) {
+        this.productNeeded = productNeeded;
+    }
+
+    public boolean needToBuy(){
+        boolean needToBuy = false;
+        if (isLowerThanMin()){
+            needToBuy = isLowerThanMin;
+        }
+        if (productNeeded>0){
+            needToBuy = true;
+        }
+        return needToBuy;
+    }
 }

@@ -131,20 +131,8 @@ public class Main extends Fragment {
         btnPreviousMonth = (Button)rootView.findViewById(R.id.btnPrevious);
         tvMonth.setText(dateFormatForMonth.format(calendarView.getFirstDayOfCurrentMonth()));
         recyclerView = (RecyclerView) rootView.findViewById(R.id.main_recycler_view);
-        ProductDBAdapter productDBAdapter = new ProductDBAdapter(recyclerView.getContext());
-        List<Product> products = null;
-        try {
-            productDBAdapter.open();
-            products = productDBAdapter.getAllItemsOrderByQuantity();
-        }catch (SQLiteException e){
-            Log.e(TAG, "Error:"+ e.getMessage());
-            //Add ui if list is empty
-        } catch (SQLException e) {
-            Log.e(TAG, "Error:"+ e.getMessage());
-        }finally {
-            productDBAdapter.close();
-        }
-        adapter = new ProductContentAdapter(recyclerView.getContext(),products, false);
+
+        adapter = new ProductContentAdapter(recyclerView.getContext(),getProducts(), true);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -171,7 +159,7 @@ public class Main extends Fragment {
                     intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
                     startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
                 }else{
-                    showDeleteDialogConfirmation(events);
+                    showOrderListDialog(events);
                 }
                 //TODO: Check if only one event per day if no display a pop up to choose one
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));
@@ -212,6 +200,10 @@ public class Main extends Fragment {
     public void onResume() {
         super.onResume();
         initFloatingActionButtons();
+        adapter = new ProductContentAdapter(recyclerView.getContext(),getProducts(), true);
+        adapter.clearSelectedIds();
+        adapter.displayFloatingActionButtons();
+        recyclerView.setAdapter(adapter);
     }
 
     public List<Event> getEvents(Context context, Date date){
@@ -232,7 +224,7 @@ public class Main extends Fragment {
         }
         return events;
     }
-    private void showDeleteDialogConfirmation(final List<Event> events) {
+    private void showOrderListDialog(final List<Event> events) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
         List<String> strings = new ArrayList<String>();
         for (Event e:events) {
@@ -301,4 +293,91 @@ public class Main extends Fragment {
         // show alert
         alertDialog.show();
     }
+    private void showProductDialog(final List<Event> events) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(recyclerView.getContext());
+        List<String> strings = new ArrayList<String>();
+        for (Event e:events) {
+            strings.add(((Order)e.getData()).getNameAndDate());
+        }
+
+        alertDialogBuilder.setTitle(R.string.mainSelectOrder);
+//        alertDialogBuilder
+//                .setMessage(getString(R.string.orderDiaglogConfirmationText));
+        alertDialogBuilder.setItems(strings.toArray(new String[strings.size()]), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(getActivity(), FormOrder.class);
+                Event event = events.get(which);
+                long id = ((Order)event.getData()).getOrderId();
+                intent.putExtra(IS_UPDATE,true);
+                intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
+                startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
+            }
+        });
+
+
+        // set positive button YES message
+//        alertDialogBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+//
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                // delete the employee and refresh the list
+////                Long selectedId;
+////                short size;
+////                SparseBooleanArray selected;
+////                OrderDBAdapter orderDBAdapter = new OrderDBAdapter(recyclerView.getContext());
+////                selected = adapter.getSelectedIds();
+////                size = (short) selected.size();
+////                long ids[] = new long[size];
+////                for (int i = 0 ; i<(size); i++){
+////                    if (selected.valueAt(i)){
+////                        selectedId = adapter.getItemId(selected.keyAt(i));
+////                        adapter.toggleSelection(selected.keyAt(i));
+////                        ids[i] = selectedId;
+////                    }
+////                }
+////                if (orderDBAdapter.deleteItemsByIds(ids)) {
+////                    Toast.makeText(recyclerView.getContext(), "Deleted " +size +" orders", Toast.LENGTH_SHORT).show();
+////                    adapter.notifyDataSetChanged();
+////                    onResume();
+////                }else{
+////                    Log.d(TAG, "Error trying to delete orders");
+////                    Toast.makeText(recyclerView.getContext(), getText(R.string.deleteErrorText), Toast.LENGTH_SHORT).show();
+////                }
+//
+//            }
+//        });
+
+        // set neutral button OK
+        alertDialogBuilder.setNeutralButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show alert
+        alertDialog.show();
+    }
+
+    public List<Product> getProducts(){
+        ProductDBAdapter productDBAdapter = new ProductDBAdapter(recyclerView.getContext());
+        List<Product> products = null;
+        try {
+            productDBAdapter.open();
+            products = productDBAdapter.getAllProductNeededForOrder();
+        }catch (SQLiteException e){
+            Log.e(TAG, "Error:"+ e.getMessage());
+            //Add ui if list is empty
+        } catch (SQLException e) {
+            Log.e(TAG, "Error:"+ e.getMessage());
+        }finally {
+            productDBAdapter.close();
+        }
+        return products;
+    }
+
 }
