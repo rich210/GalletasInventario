@@ -164,7 +164,6 @@ public class MainOrders extends Fragment implements View.OnClickListener {
                 }
                 break;
             case R.id.Deletefab:
-                //TODO: Add dialog to delete
                 showDeleteDialogConfirmation();
                 break;
 

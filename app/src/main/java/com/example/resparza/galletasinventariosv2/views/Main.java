@@ -149,8 +149,7 @@ public class Main extends Fragment {
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
-                //TODO: Redirect to order form when the event is clicked
-                Intent intent = new Intent(getActivity(), FormOrder.class);
+                                Intent intent = new Intent(getActivity(), FormOrder.class);
                 List<Event> events = calendarView.getEvents(dateClicked);
                 if(events.size()== 1){
                     Event event = events.get(0);
@@ -161,7 +160,7 @@ public class Main extends Fragment {
                 }else{
                     showOrderListDialog(events);
                 }
-                //TODO: Check if only one event per day if no display a pop up to choose one
+
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));
                 Log.d(TAG, "inside onclick " + dateFormatForDisplaying.format(dateClicked) + calendarView.getEvents(dateClicked));
             }

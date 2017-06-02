@@ -464,6 +464,8 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                                 setResult(RESULT_OK);
                                 recipeDBAdapter.close();
                                 finish();
+                            }else {
+                                Log.e(TAG, "saveRecipe: Error saving recipe");
                             }
                         }else{
                             recipe.setRecipeId(Long.valueOf(this.tvRecipeId.getText().toString()));

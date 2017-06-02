@@ -76,15 +76,13 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
                         Log.d(TAG,product.getInfo());
                     }
                 });
-        }else{
+            }else{
                 holder.productCardView.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View v) {
                         showProductDialog(product);
                     }
                 });
             }
-        //TODO: Add a dialog displaying how much it need for the next order
-
         if (product.needToBuy()){
             holder.productCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.itemProductLowerThanMin));
         }else {

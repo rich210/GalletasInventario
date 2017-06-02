@@ -61,11 +61,10 @@ public class OrderDBAdapter {
 
     public long insertItem(Order order) {
         long orderId = 0;
-
         OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         ContentValues initialValues = itemToValues(order, false);
-        this.mDb.beginTransaction();
         try{
+            this.mDb.beginTransaction();
             orderId = this.mDb.insert(ORDER_TABLE, null, initialValues);
             if(orderId>0){
                 for (OrderRecipe orderRecipe: order.getOrderRecipes()) {
@@ -78,14 +77,12 @@ public class OrderDBAdapter {
                 }
                 this.mDb.setTransactionSuccessful();
             }
+        }catch(Exception e){
+            Log.e(TAG, "insertItem: Error "+ e.getMessage(),e.getCause());
         }
-        catch (Exception e){
+        this.mDb.endTransaction();
+        return orderId;
 
-        }
-        finally {
-            this.mDb.endTransaction();
-            return orderId;
-        }
     }
 
     public boolean deleteItemById(long orderId) {
@@ -94,7 +91,7 @@ public class OrderDBAdapter {
     }
     //TODO: Add function to set to cancel beside delete
     public boolean deleteItemsByIds(long orderIds[]) {
-        //TODO: Add transaction and logic to delete orders recipes
+
         StringBuilder whereClause = new StringBuilder();
         whereClause.append(ORDER_ID + " IN (");
         for (int i = 0; i <= orderIds.length; i++) {
@@ -171,14 +168,14 @@ public class OrderDBAdapter {
     }
 
     public boolean updateItem(Order order) {
-        //TODO: Add transaction
         boolean isOrderUpdated =true;
         OrderRecipeDBAdapter orderRecipeDBAdapter = new OrderRecipeDBAdapter(mCtx);
         ContentValues values = itemToValues(order, true);
         Log.d(TAG, "updateItem: "+values.toString());
         Log.d(TAG, "updateItem: "+ order.toString());
-        this.mDb.beginTransaction();
+
         try{
+            this.mDb.beginTransaction();
             isOrderUpdated = this.mDb.update(ORDER_TABLE, values, ORDER_ID + "=" + order.getOrderId(), null) > 0;
             if(isOrderUpdated){
                 try {
@@ -188,26 +185,16 @@ public class OrderDBAdapter {
                             throw new RuntimeException("Error updating order recipe");
                         }
                     }
-
-//                    this.mDb.execSQL("update tbl_products set quantity = (select tbl_products.quantity - t2.product_used" +
-//                            "                                                        from view_product_used t2" +
-//                            "                                                        where tbl_products.product_id = t2.product_id" +
-//                            "                                                        and t2.order_id = ?)" +
-//                            "                    where product_id in (select product_id" +
-//                            "                                                        from view_product_used t2" +
-//                            "                                                        where tbl_products.product_id = t2.product_id" +
-//                            "                                                        and t2.order_id = ?)", order.getOrderId());
-                    //TODO: Add query to update the producte when the order is completed
-                    /*
-                    update tbl_products set quantity = (select tbl_products.quantity - t2.product_used
-                                                        from view_product_used t2
-                                                        where tbl_products.product_id = t2.product_id
-                                                        and t2.order_id = 2)
-                    where product_id in (select product_id
-                                                        from view_product_used t2
-                                                        where tbl_products.product_id = t2.product_id
-                                                        and t2.order_id = 2)
-                     */
+                    if(order.getOrderStatus().equals("Entregado")){
+                        this.mDb.execSQL("update "+ ProductDBAdapter.PRODUCT_TABLE+" set "+ ProductDBAdapter.QUANTITY+" = (select "+ProductDBAdapter.PRODUCT_TABLE+"."+ProductDBAdapter.QUANTITY+" - t2.product_used" +
+                                "                                                        from view_product_used t2" +
+                                "                                                        where "+ ProductDBAdapter.PRODUCT_TABLE+"."+ProductDBAdapter.PRODUCT_ID+" = t2.product_id" +
+                                "                                                        and t2.order_id = "+order.getOrderId()+")" +
+                                "                    where product_id in (select product_id" +
+                                "                                                        from view_product_used t2" +
+                                "                                                        where "+ ProductDBAdapter.PRODUCT_TABLE+"."+ProductDBAdapter.PRODUCT_ID+" = t2.product_id" +
+                                "                                                        and t2.order_id = "+order.getOrderId()+")");
+                    }
                     this.mDb.setTransactionSuccessful();
                 } catch (Exception e) {
                     isOrderUpdated = false;
@@ -221,10 +208,9 @@ public class OrderDBAdapter {
             isOrderUpdated = false;
             Log.e(TAG, "updateItem: Error",e );
         }
-        finally {
-            this.mDb.endTransaction();
-            return isOrderUpdated;
-        }
+        this.mDb.endTransaction();
+        return isOrderUpdated;
+
     }
 
     private ContentValues itemToValues(Order order, boolean isUpdate) {
@@ -259,7 +245,6 @@ public class OrderDBAdapter {
         order.setTotal(c.getFloat(c.getColumnIndex(TOTAL)));
         order.setSellPrice(c.getFloat(c.getColumnIndex(SELL_PRICE)));
         order.setOrderStatus(c.getString(c.getColumnIndex(ORDER_STATUS)));
-        //TODO: Add colors to the background
         if(order.getOrderStatus().equals(strings[1])){ //Open State
             order.setColorStatus(ResourcesCompat.getColor(mCtx.getResources(), R.color.stateOpen, null));
         }else if (order.getOrderStatus().equals(strings[2])){ //Working State

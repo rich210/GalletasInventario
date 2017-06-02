@@ -28,11 +28,11 @@ public class RecipeDBAdapter {
     public static final String RECIPE_NAME = "recipe_name";
     //public static final String MEASURE_TYPE_ID = "measure_type_id";
     public static final String QUANTITY = "quantity";
-    public static final String RECIPE_COST = "recipe_cost"; //TODO: Delete recipe cost column it will be generated
+    //public static final String RECIPE_COST = "recipe_cost"; //TODO: Delete recipe cost column it will be generated
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";
     public static final String IMAGE_PATH = "image_path";
-    public static final String RECIPE_INSTRUCTIONS = "recipe_instructions"; //TODO: Add recipe instruction to database
+    public static final String RECIPE_INSTRUCTIONS = "recipe_instructions";
 
     public static final String RECIPE_TABLE = "tbl_recipes";
     private final Context mCtx;
@@ -60,21 +60,30 @@ public class RecipeDBAdapter {
     }
 
     public long insertItem(Recipe recipe, List<RecipeProduct> recipeProductList) throws SQLException {
-        //TODO: Add transaction
+        long recipeId = 0;
         ContentValues initialValues = itemToValues(recipe, false);
-        long recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
-        RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
-        recipeProductDBAdapter.open();
-        for (RecipeProduct recipeProduct: recipeProductList) {
-            recipeProduct.setRecipeId(recipeId);
-            long recipeProductId = recipeProductDBAdapter.insertItem(recipeProduct);
-            if (recipeProductId<1){
-                Log.e(TAG,"Error trying to insert recipe product");
-                break;
+
+        try {
+            this.mDb.beginTransaction();
+            recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
+            RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
+            recipeProductDBAdapter.open();
+            for (RecipeProduct recipeProduct: recipeProductList) {
+                recipeProduct.setRecipeId(recipeId);
+                long recipeProductId = recipeProductDBAdapter.insertItem(recipeProduct);
+                if (recipeProductId<1){
+                    Log.e(TAG,"Error trying to insert recipe product");
+                    break;
+                }
             }
+            recipeProductDBAdapter.close();
+            this.mDb.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.e(TAG, "insertItem: Error:",e );
         }
-        recipeProductDBAdapter.close();
+        this.mDb.endTransaction();
         return recipeId;
+
     }
 
     public boolean deleteItemById(long recipeId) {
@@ -83,12 +92,12 @@ public class RecipeDBAdapter {
     }
 
     public boolean deleteItemsByIds(long recipeIds[]) {
-        //TODO: Add transaction
         RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
-        boolean isDeleted = true;
+        boolean isDeleted = false;
         StringBuilder whereClause = new StringBuilder();
         whereClause.append(RECIPE_ID + " IN (");
         try {
+            this.mDb.beginTransaction();
             recipeProductDBAdapter.open();
             for (int i = 0; i <= recipeIds.length- 1; i++) {
                 if (i < recipeIds.length - 1)
@@ -107,9 +116,11 @@ public class RecipeDBAdapter {
                 Log.e(TAG, "Error tryinn to delete in tbl_recipe_product");
             recipeProductDBAdapter.close();
              //$NON-NLS-1$
+            this.mDb.setTransactionSuccessful();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        this.mDb.endTransaction();
         return isDeleted;
     }
 
@@ -151,24 +162,31 @@ public class RecipeDBAdapter {
     }
 
     public boolean updateItem(Recipe recipe, List<RecipeProduct> recipeProducts) throws SQLException {
-        //TODO: Add transaction
+        boolean isRecipeUpdated = false;
         ContentValues values = itemToValues(recipe, true);
-        boolean isRecipeUpdated = this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
-        if (isRecipeUpdated){
-            RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
-            recipeProductDBAdapter.open();
-            for (RecipeProduct recipeProduct: recipeProducts) {
-                isRecipeUpdated = recipeProductDBAdapter.updateItem(recipeProduct);
-                if (!isRecipeUpdated){
-                    Log.e(TAG,"Error trying to insert recipe product");
-                    break;
-                }
-            }
-            recipeProductDBAdapter.close();
-        }else {
-            Log.e(TAG, "updateItem: Error updating recipe");
-        }
 
+        try{
+            this.mDb.beginTransaction();
+            isRecipeUpdated = this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
+            if (isRecipeUpdated){
+                RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
+                recipeProductDBAdapter.open();
+                for (RecipeProduct recipeProduct: recipeProducts) {
+                    isRecipeUpdated = recipeProductDBAdapter.updateItem(recipeProduct);
+                    if (!isRecipeUpdated){
+                        Log.e(TAG,"Error trying to insert recipe product");
+                        break;
+                    }
+                }
+                recipeProductDBAdapter.close();
+            }else {
+                Log.e(TAG, "updateItem: Error updating recipe");
+            }
+            this.mDb.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.e(TAG, "updateItem: Error"+e.getMessage(),e.getCause());
+        }
+        this.mDb.endTransaction();
         return isRecipeUpdated;
     }
 
@@ -178,7 +196,7 @@ public class RecipeDBAdapter {
         recipe.setRecipeId(cursor.getInt(cursor.getColumnIndex(RECIPE_ID)));
         recipe.setRecipeName(cursor.getString(cursor.getColumnIndex(RECIPE_NAME)));
         recipe.setMeasureTypeQuantity(cursor.getInt(cursor.getColumnIndex(QUANTITY)));
-        recipe.setRecipeCost(cursor.getFloat(cursor.getColumnIndex(RECIPE_COST)));
+        //recipe.setRecipeCost(cursor.getFloat(cursor.getColumnIndex(RECIPE_COST)));
         recipe.setRecipeImagePath(cursor.getString(cursor.getColumnIndex(IMAGE_PATH)));
         recipe.setRecipeInstructions(cursor.getString(cursor.getColumnIndex(RECIPE_INSTRUCTIONS)));
         try {
@@ -190,8 +208,6 @@ public class RecipeDBAdapter {
             e.printStackTrace();
             Log.e(TAG, "Error obtaining recipe products");
         }
-
-
         return recipe;
 
     }
