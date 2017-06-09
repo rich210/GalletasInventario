@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:dropDownListViewStyle">@style/SpinnerStyle</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -26,5 +27,9 @@
         <item name="android:paddingTop">@dimen/text_view_padding_top</item>
         <item name="android:textColor">@color/colorPrimaryTextDark</item>
         <item name="android:textSize">@dimen/text_view_text_size</item>
+    </style>
+
+    <style name="SettingsTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
     </style>
 </resources>

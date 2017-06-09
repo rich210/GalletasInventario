@@ -1,4 +1,4 @@
-package com.example.resparza.galletasinventariosv2.views;
+package com.example.resparza.galletasinventariosv2.views.miscellaneous;
 
 import android.content.Context;
 import android.util.AttributeSet;

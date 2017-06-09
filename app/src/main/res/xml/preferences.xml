@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+     >
+<ListPreference
+    android:key="pref_calendar_account"
+    android:title="Cuenta de calendario"
+    android:dialogTitle="Cuenta de calendario">
+
+</ListPreference>
+</PreferenceScreen>

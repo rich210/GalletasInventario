@@ -21,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import com.example.resparza.galletasinventariosv2.dbadapters.DBAdapter;
 import com.example.resparza.galletasinventariosv2.views.Main;
 import com.example.resparza.galletasinventariosv2.views.measurementsTypes.MainMeasurements;
+import com.example.resparza.galletasinventariosv2.views.miscellaneous.SettingsFragment;
 import com.example.resparza.galletasinventariosv2.views.orders.MainOrders;
 import com.example.resparza.galletasinventariosv2.views.products.MainProducts;
 import com.example.resparza.galletasinventariosv2.views.recipes.MainRecipes;
@@ -143,6 +144,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_measures:
                 fragmentClass = MainMeasurements.class;
+                break;
+            case R.id.nav_settings:
+                fragmentClass = SettingsFragment.class;
                 break;
             default:
                 fragmentClass = Main.class;
