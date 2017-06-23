@@ -20,6 +20,7 @@ public class Order {
     private double gain;
     private String orderStatus;
     private int colorStatus;
+    private long eventId;
 
     public Order() {
     }
@@ -150,6 +151,14 @@ public class Order {
         this.colorStatus = colorStatus;
     }
 
+    public long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(long eventId) {
+        this.eventId = eventId;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -164,6 +173,7 @@ public class Order {
                 ", gain=" + gain +
                 ", orderStatus='" + orderStatus + '\'' +
                 ", colorStatus=" + colorStatus +
+                ", eventId=" + eventId +
                 '}';
     }
 

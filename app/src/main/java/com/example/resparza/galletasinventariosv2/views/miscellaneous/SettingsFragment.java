@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.util.Log;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ import java.util.List;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 
+    private final String TAG = "SettingsFragment";
     private MyCalendar calendars[];
     ListPreference listPreference;
 
@@ -40,23 +43,20 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     }
 
     private void getCalendars() {
-        String[] l_projection = new String[]{"_id", "displayName"};
-        Uri l_calendars = CalendarContract.Calendars.CONTENT_URI;;
-        Cursor l_managedCursor = getActivity().getContentResolver().query(l_calendars, l_projection, null, null, null);	//all calendars
+        String[] l_projection = new String[]{CalendarContract.Calendars._ID, CalendarContract.Calendars.ACCOUNT_NAME, CalendarContract.Calendars.ACCOUNT_TYPE, CalendarContract.Calendars.OWNER_ACCOUNT};
+        Uri l_calendars = CalendarContract.Calendars.CONTENT_URI;
+        String selection = "(("+ CalendarContract.Calendars.ACCOUNT_TYPE + " = ?) AND ("
+                + CalendarContract.Calendars.OWNER_ACCOUNT + " = "+ CalendarContract.Calendars.ACCOUNT_NAME+"))";
+        String[] selectionArgs = new String[] {"com.google"};
+        Cursor c = getActivity().getContentResolver().query(l_calendars, l_projection, selection, selectionArgs, null);	//all calendars
         //Cursor l_managedCursor = this.managedQuery(l_calendars, l_projection, "selected=1", null, null);   //active calendars
-        if (l_managedCursor.moveToFirst()) {
-            calendars = new MyCalendar[l_managedCursor.getCount()];
-            String l_calName;
-            String l_calId;
+        if (c.moveToFirst()) {
+            calendars = new MyCalendar[c.getCount()];
             int l_cnt = 0;
-            int l_nameCol = l_managedCursor.getColumnIndex(l_projection[1]);
-            int l_idCol = l_managedCursor.getColumnIndex(l_projection[0]);
             do {
-                l_calName = l_managedCursor.getString(l_nameCol);
-                l_calId = l_managedCursor.getString(l_idCol);
-                calendars[l_cnt] = new MyCalendar(l_calName, l_calId);
+                calendars[l_cnt] = cursorToCalendar(c);
                 ++l_cnt;
-            } while (l_managedCursor.moveToNext());
+            } while (c.moveToNext());
         }
     }
 
@@ -68,12 +68,24 @@ public class SettingsFragment extends PreferenceFragmentCompat {
         //List<CharSequence> entryValues = new ArrayList<CharSequence>();
 
         for (MyCalendar calendar: calendars) {
-            entries[i] = calendar.getId();
-            entryValues[i] = calendar.getName();
+            Log.d(TAG, "setListPreference: "+calendar.toString());
+            entries[i] = calendar.getName();
+            entryValues[i] = calendar.getId();
             i++;
         }
         listPreference.setEntries(entries);
         listPreference.setEntryValues(entryValues);
+        listPreference.setDefaultValue(entryValues[0]);
+    }
+
+    private MyCalendar cursorToCalendar (Cursor c){
+        MyCalendar calendar = new MyCalendar();
+        calendar.setId(c.getString(c.getColumnIndex(CalendarContract.Calendars._ID)));
+        calendar.setName(c.getString(c.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)));
+        calendar.setAccountType(c.getString(c.getColumnIndex(CalendarContract.Calendars.ACCOUNT_TYPE)));
+        calendar.setAccountOwner(c.getString(c.getColumnIndex(CalendarContract.Calendars.OWNER_ACCOUNT)));
+
+        return calendar;
     }
 }
 

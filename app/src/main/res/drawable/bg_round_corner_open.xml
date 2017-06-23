@@ -16,4 +16,5 @@
             <corners android:radius="10dp" />
         </shape>
     </item>
+    <item android:drawable="@drawable/ic_open"/>
 </layer-list>

@@ -1,10 +1,17 @@
 package com.example.resparza.galletasinventariosv2.views.orders;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.renderscript.ScriptGroup;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -237,20 +244,30 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                         setResult(RESULT_OK);
                         Log.d(TAG, "saveOrder: The order was updated correctyl");
                         orderDBAdapter.close();
+                        if(order.getOrderStatus().equals("Cancelado")){
+                            deleteCalendarEvent(order.getEventId());
+                        }
                         finish();
                     }else{
                         Log.d(TAG, "saveOrder: the order is not updated correctly");
                     }
                 }else{
-                    order.setOrderId(orderDBAdapter.insertItem(order));
-                    if(order.getOrderId()>0){
-                        setResult(RESULT_OK);
-                        Log.d(TAG, "saveOrder: The order was inserted correctly");
-                        orderDBAdapter.close();
-                        finish();
+
+                    order.setEventId(insertCalendarEvent(order));
+                    if(order.getEventId()>0){
+                        order.setOrderId(orderDBAdapter.insertItem(order));
+                        if(order.getOrderId()>0){
+                            setResult(RESULT_OK);
+                            Log.d(TAG, "saveOrder: The order was inserted correctly");
+                            orderDBAdapter.close();
+                            finish();
+                        }else{
+                            Log.e(TAG, "saveOrder: Error inserting order");
+                        }
                     }else{
-                        Log.e(TAG, "saveOrder: Error inserting order");
+                        Log.e(TAG, "saveOrder: Error inserting event");
                     }
+
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -519,5 +536,49 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                     break;
             }
         }
+    }
+
+    public long insertCalendarEvent(Order order){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        long calendarId = Long.valueOf(sharedPref.getString("pref_calendar_account","1"));
+        int daysBefore = sharedPref.getInt("pref_days_reminder", 1);
+        long startMillis = 0;
+        long endMillis = 0;
+        Calendar time = Calendar.getInstance();
+        time.setTime(order.getDeliveryDate());
+        time.set(time.get(Calendar.YEAR), time.get(Calendar.MONTH),time.get(Calendar.DATE), 0 , 0, 0);
+        startMillis = time.getTimeInMillis();
+
+        time.set(time.get(Calendar.YEAR), time.get(Calendar.MONTH),time.get(Calendar.DATE), 23 , 59, 59);
+        endMillis = time.getTimeInMillis();
+
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        values.put(CalendarContract.Events.DTSTART, startMillis);
+        values.put(CalendarContract.Events.DTEND, endMillis);
+        values.put(CalendarContract.Events.TITLE, "Pedido para: "+ order.getClientName());
+        values.put(CalendarContract.Events.DESCRIPTION, order.toString());
+        values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
+        values.put(CalendarContract.Events.EVENT_TIMEZONE, "America/Mexico_City");
+        Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+
+        long eventID = Long.parseLong(uri.getLastPathSegment());
+        if(eventID>0){
+            Log.d(TAG, "insertCalendarEvent: event "+eventID);
+        }
+        ContentValues reminderValues = new ContentValues();
+        reminderValues.put(CalendarContract.Reminders.MINUTES, ((60*24)*daysBefore));
+        reminderValues.put(CalendarContract.Reminders.EVENT_ID, eventID);
+        reminderValues.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
+        uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);
+        return eventID;
+    }
+
+    private void deleteCalendarEvent(long eventId){
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        Uri deleteUri = null;
+        deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId);
+        int rows = getContentResolver().delete(deleteUri, null, null);
     }
 }

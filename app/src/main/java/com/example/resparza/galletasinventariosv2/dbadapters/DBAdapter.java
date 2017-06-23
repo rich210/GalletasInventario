@@ -58,6 +58,7 @@ public class DBAdapter {
                     + OrderDBAdapter.ORDER_STATUS+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.SELL_PRICE+" REAL," //$NON-NLS-1$
                     + OrderDBAdapter.TOTAL+" REAL," //$NON-NLS-1$
+                    + OrderDBAdapter.EVENT_ID+" REAL"
                     + OrderDBAdapter.CREATED_ON+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.UPDATED_ON+" TEXT);"; //$NON-NLS-1$
 

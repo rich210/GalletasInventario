@@ -7,10 +7,15 @@ package com.example.resparza.galletasinventariosv2.views.miscellaneous;
 public class MyCalendar {
     private String name;
     private String id;
+    private String accountType;
+    private String accountOwner;
 
     public MyCalendar(String _name, String _id) {
         name = _name;
         id = _id;
+    }
+
+    public MyCalendar() {
     }
 
     public String getName() {
@@ -29,8 +34,29 @@ public class MyCalendar {
         this.id = id;
     }
 
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
+
+    public String getAccountOwner() {
+        return accountOwner;
+    }
+
+    public void setAccountOwner(String accountOwner) {
+        this.accountOwner = accountOwner;
+    }
+
     @Override
     public String toString() {
-        return name;
+        return "MyCalendar{" +
+                "name='" + name + '\'' +
+                ", id='" + id + '\'' +
+                ", accountType='" + accountType + '\'' +
+                ", accountOwner='" + accountOwner + '\'' +
+                '}';
     }
 }
