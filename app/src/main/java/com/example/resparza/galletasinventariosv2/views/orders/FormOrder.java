@@ -542,6 +542,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         long calendarId = Long.valueOf(sharedPref.getString("pref_calendar_account","1"));
         int daysBefore = sharedPref.getInt("pref_days_reminder", 1);
+        int notificationTime = sharedPref.getInt("pref_time_reminder", 8);
         long startMillis = 0;
         long endMillis = 0;
         Calendar time = Calendar.getInstance();
@@ -557,7 +558,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         values.put(CalendarContract.Events.DTSTART, startMillis);
         values.put(CalendarContract.Events.DTEND, endMillis);
         values.put(CalendarContract.Events.TITLE, "Pedido para: "+ order.getClientName());
-        values.put(CalendarContract.Events.DESCRIPTION, order.toString());
+        values.put(CalendarContract.Events.DESCRIPTION, order.getOrderDescription());
         values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
         values.put(CalendarContract.Events.EVENT_TIMEZONE, "America/Mexico_City");
         Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
@@ -567,7 +568,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
             Log.d(TAG, "insertCalendarEvent: event "+eventID);
         }
         ContentValues reminderValues = new ContentValues();
-        reminderValues.put(CalendarContract.Reminders.MINUTES, ((60*24)*daysBefore));
+        reminderValues.put(CalendarContract.Reminders.MINUTES, (((60*24)*daysBefore)+notificationTime));
         reminderValues.put(CalendarContract.Reminders.EVENT_ID, eventID);
         reminderValues.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
         uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);

@@ -159,8 +159,11 @@ public class Main extends Fragment {
                     intent.putExtra(IS_UPDATE,true);
                     intent.putExtra(EXTRA_SELECTED_ORDER_ID, id);
                     startActivityForResult(intent, REQUEST_CODE_MODIFY_ORDER);
-                }else{
+                }else if (events.size()>1){
                     showOrderListDialog(events);
+                }else{
+                    intent.putExtra(IS_UPDATE,false);
+                    startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
                 }
 
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));

@@ -18,6 +18,10 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import com.example.resparza.galletasinventariosv2.dbadapters.DBAdapter;
 import com.example.resparza.galletasinventariosv2.views.Main;
 import com.example.resparza.galletasinventariosv2.views.measurementsTypes.MainMeasurements;
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity
     private static FloatingActionButton afab;
     private static FloatingActionButton dfab;
     private static FloatingActionButton efab;
+    private AdView mAdView;
     //Animations
     private static Animation dfbOpen,efbOpen, afbOpen,fbClose;
     private static boolean isDfabOpen = false;
@@ -49,6 +54,15 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //TODO: Uncomment ad app id when it released
+        String adAppId = "ca-app-pub-9102302636499642~7518001410";
+        //String adAppId = "ca-app-pub-3940256099942544/6300978111";
+        MobileAds.initialize(this, adAppId);
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("95775FA647BCF103AB1894D2E28F56A6") //Delete this after test
+                .build();
+        mAdView.loadAd(adRequest);
         db = new DBAdapter(getApplicationContext());
 
         try {
@@ -94,6 +108,30 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -106,7 +144,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 

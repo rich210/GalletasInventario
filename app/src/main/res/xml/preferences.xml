@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
      >
-<ListPreference
-    android:key="pref_calendar_account"
-    android:title="Cuenta de calendario"
-    android:dialogTitle="Cuenta de calendario"/>
+    <PreferenceCategory
+        android:title="Notificaciones">
+        <ListPreference
+            android:key="pref_calendar_account"
+            android:title="Cuenta de calendario"
+            android:dialogTitle="Cuenta de calendario"
+            android:summary="Cuenta de correo electronico para la notificación de calendario"/>
 
-    <EditTextPreference
-        android:key="pref_days_reminder"
-        android:summary="Numero de dias para recordar el pedido"
-        android:title="No. de dias para pedido" />
+        <EditTextPreference
+            android:key="pref_days_reminder"
+            android:summary="Dias anticipados para notificar sobre el pedido"
+            android:title="No. de dias notificacion"
+            android:inputType="number"/>
+        <EditTextPreference
+            android:key="pref_time_reminder"
+            android:summary="Hora de la notificación del pedido"
+            android:title="Hora para notificación"
+            android:inputType="number"/>
+    </PreferenceCategory>
+
 </PreferenceScreen>

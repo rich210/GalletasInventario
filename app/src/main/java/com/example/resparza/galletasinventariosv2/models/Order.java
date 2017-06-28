@@ -143,6 +143,18 @@ public class Order {
         return recipeNames.toString();
     }
 
+    public String getRecipesAndQuanrities(){
+        StringBuilder recipeNames = new StringBuilder();
+        for (OrderRecipe orderRecipe:this.orderRecipes) {
+            if(!recipeNames.toString().isEmpty()){
+                recipeNames.append(" \n");
+            }
+            recipeNames.append("Receta: "+orderRecipe.getRecipeName()+ " Cantidad: " + orderRecipe.getOrderQuantity());
+
+        }
+        return recipeNames.toString();
+    }
+
     public int getColorStatus() {
         return colorStatus;
     }
@@ -179,5 +191,12 @@ public class Order {
 
     public String getNameAndDate(){
         return clientName + " " + getFormatedDelivaryDate();
+    }
+
+    public String getOrderDescription(){
+        StringBuilder s = new StringBuilder();
+        s.append("El pedido consta de: \n");
+        s.append(getRecipesAndQuanrities());
+        return s.toString();
     }
 }

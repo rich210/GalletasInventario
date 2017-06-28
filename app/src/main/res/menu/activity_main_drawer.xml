@@ -1,32 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/menuMain">
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
-            android:title="Home"
+            android:title="@string/menuHome"
             android:checked="true"/>
         <item
             android:id="@+id/nav_orders"
             android:icon="@drawable/ic_cake"
-            android:title="Pedidos" />
+            android:title="@string/menuOrders" />
         <item
             android:id="@+id/nav_recipes"
             android:icon="@drawable/ic_roller"
-            android:title="Recetas" />
+            android:title="@string/menuRecipes" />
         <item
             android:id="@+id/nav_products"
             android:icon="@drawable/ic_flour"
-            android:title="Productos" />
+            android:title="@string/menuProducts" />
         <item
             android:id="@+id/nav_measures"
             android:icon="@drawable/ic_scale"
-            android:title="Medidas" />
+            android:title="@string/menuMeasurements" />
+
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:menuCategory="secondary"
+        android:id="@+id/menuSecundary">
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
-            android:title="Configuraciones" />
+            android:title="@string/menuSettings" />
     </group>
 
 </menu>

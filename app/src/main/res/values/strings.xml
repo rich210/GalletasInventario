@@ -54,5 +54,12 @@
     <string name="simbol_next"><![CDATA[>]]></string>
     <string name="mainSelectOrder">Seleccione la orden</string>
 
+    <string name="menuSettings">Configuraciones</string>
+    <string name="menuMeasurements">Medidas</string>
+    <string name="menuProducts">Productos</string>
+    <string name="menuRecipes">Recetas</string>
+    <string name="menuOrders">Pedidos</string>
+    <string name="menuHome">Principal</string>
+
 
 </resources>
