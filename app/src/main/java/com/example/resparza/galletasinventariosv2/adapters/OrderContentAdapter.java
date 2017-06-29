@@ -1,8 +1,7 @@
 package com.example.resparza.galletasinventariosv2.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
+import android.support.transition.TransitionManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +10,9 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Transformation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,8 +20,6 @@ import android.widget.TextView;
 import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.models.Order;
-
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Order order = lItems.get(position);
-
+        final Animation anim = AnimationUtils.loadAnimation(this.context, R.anim.slide_down);
         //holder.imageRecipe.setImageDrawable(mRecipePictures[1]);
         if(order == null){
         Log.d(TAG, "Error the order is null");
@@ -87,18 +87,72 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
         holder.orderCardView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
                         //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
-                        CardView cv = (CardView)v;
+
+                    final CardView cv = (CardView)v;
                     TextView tvRecipe = (TextView) cv.findViewById(R.id.txtRecipes);
+                    final int initialHeight = v.getHeight();
+                    final int distanceToExpand = initialHeight + tvRecipe.getHeight();
+                    final int distanceToCollapse = initialHeight - tvRecipe.getHeight();
+                    Animation slideDown = AnimationUtils.loadAnimation(cv.getContext(),R.anim.slide_down);
+                    Animation slideUp = AnimationUtils.loadAnimation(cv.getContext(),R.anim.slide_up);
+                    /*
+                    Animation lvSlideDown = new Animation() {
+                        @Override
+                        protected void applyTransformation(float interpolatedTime, Transformation t) {
+                            if (interpolatedTime == 1){
+                                // Do this after expanded
+                            }
+
+                            cv.getLayoutParams().height = (int) (initialHeight + (distanceToExpand * interpolatedTime));
+                            cv.requestLayout();
+                        }
+
+                        @Override
+                        public boolean willChangeBounds() {
+                            return true;
+                        }
+                    };
+
+                    Animation lvSlideUp = new Animation() {
+                        @Override
+                        protected void applyTransformation(float interpolatedTime, Transformation t) {
+                            if (interpolatedTime == 1){
+                                // Do this after expanded
+                            }
+
+                            cv.getLayoutParams().height = (int) (initialHeight - (distanceToCollapse * interpolatedTime));
+                            cv.requestLayout();
+                        }
+
+                        @Override
+                        public boolean willChangeBounds() {
+                            return true;
+                        }
+                    };
+                    lvSlideDown.setDuration(500);
+                    lvSlideUp.setDuration(500);
+                    //Animation lvSlideDown = AnimationUtils.loadAnimation(cv.getContext(),R.anim.lv_slide_down);
+                    //Animation lvSlideUp = AnimationUtils.loadAnimation(cv.getContext(),R.anim.lv_slide_up);
+                    */
                     if (tvRecipe.getVisibility()== View.GONE)
                     {
+
+                        TransitionManager.beginDelayedTransition(cv);
                         tvRecipe.setVisibility(View.VISIBLE);
+                        tvRecipe.startAnimation(slideDown);
+
+                        //v.startAnimation(lvSlideDown);
+
                     }else {
+                        tvRecipe.startAnimation(slideUp);
                         tvRecipe.setVisibility(View.GONE);
+                        TransitionManager.beginDelayedTransition(cv);
+                        //v.startAnimation(lvSlideUp);
                     }
                         RecyclerView rv = (RecyclerView)v.getParent();
                         toggleSelection(position);
                         if(isToggleSelection(position)){
-                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
+                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
 
                         }else{
 //                            cv.setCardBackgroundColor(order.getColorStatus());

@@ -52,6 +52,11 @@ public class RecipeProductDBAdapter {
         return this.mDb.insert(RECIPE_PRODUCT_TABLE, null, initialValues);
     }
 
+    public long insertItem(RecipeProduct recipeProduct, SQLiteDatabase mDb) {
+        ContentValues initialValues = itemToValues(recipeProduct, false);
+        return mDb.insert(RECIPE_PRODUCT_TABLE, null, initialValues);
+    }
+
     public boolean insertItems(List<RecipeProduct> recipeProducts) {
         for (RecipeProduct recipeProduct : recipeProducts) {
             ContentValues initialValues = itemToValues(recipeProduct, false);

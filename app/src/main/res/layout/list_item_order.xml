@@ -53,20 +53,20 @@
 
         <TextView
             android:id="@+id/txtRecipes"
-            android:layout_width="wrap_content"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/txtOrderNo"
             android:text="Recetas"
             android:textSize="16dp"
+            android:textAlignment="center"
             android:padding="10dp"
-            android:textColor="@color/listSecondary"
+            android:textColor="@color/colorPrimaryText"
             android:textStyle="italic"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="35dp"
             android:layout_marginTop="2dp"
             android:layout_below="@id/lineBackgroundState"
             android:visibility="gone"
-            android:background="@drawable/primary_round_corner"/>
+            android:background="@drawable/secundary_round_corner"/>
         <TextView
             android:id="@+id/txtDeliveryDate"
             android:layout_width="wrap_content"

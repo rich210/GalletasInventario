@@ -67,7 +67,7 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
 
                         }else{
                             if (product.isLowerThanMin()){
-                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemProductLowerThanMin));
+                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
                             }else {
                                 cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
                             }

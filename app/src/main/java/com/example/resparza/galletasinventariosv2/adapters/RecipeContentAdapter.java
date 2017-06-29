@@ -72,7 +72,7 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
                 RecyclerView rv = (RecyclerView)v.getParent();
                 toggleSelection(position);
                 if(isToggleSelection(position)){
-                    cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
+                    cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
 
                 }else{
                     cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));

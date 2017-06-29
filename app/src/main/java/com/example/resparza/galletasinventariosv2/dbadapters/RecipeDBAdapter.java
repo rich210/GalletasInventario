@@ -67,16 +67,16 @@ public class RecipeDBAdapter {
             this.mDb.beginTransaction();
             recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
             RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
-            recipeProductDBAdapter.open();
+            //recipeProductDBAdapter.open();
             for (RecipeProduct recipeProduct: recipeProductList) {
                 recipeProduct.setRecipeId(recipeId);
-                long recipeProductId = recipeProductDBAdapter.insertItem(recipeProduct);
+                long recipeProductId = recipeProductDBAdapter.insertItem(recipeProduct, this.mDb);
                 if (recipeProductId<1){
                     Log.e(TAG,"Error trying to insert recipe product");
                     break;
                 }
             }
-            recipeProductDBAdapter.close();
+            //recipeProductDBAdapter.close();
             this.mDb.setTransactionSuccessful();
         }catch (Exception e){
             Log.e(TAG, "insertItem: Error:",e );
