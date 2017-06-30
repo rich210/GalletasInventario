@@ -95,45 +95,6 @@ public class OrderContentAdapter extends RecyclerView.Adapter<OrderContentAdapte
                     final int distanceToCollapse = initialHeight - tvRecipe.getHeight();
                     Animation slideDown = AnimationUtils.loadAnimation(cv.getContext(),R.anim.slide_down);
                     Animation slideUp = AnimationUtils.loadAnimation(cv.getContext(),R.anim.slide_up);
-                    /*
-                    Animation lvSlideDown = new Animation() {
-                        @Override
-                        protected void applyTransformation(float interpolatedTime, Transformation t) {
-                            if (interpolatedTime == 1){
-                                // Do this after expanded
-                            }
-
-                            cv.getLayoutParams().height = (int) (initialHeight + (distanceToExpand * interpolatedTime));
-                            cv.requestLayout();
-                        }
-
-                        @Override
-                        public boolean willChangeBounds() {
-                            return true;
-                        }
-                    };
-
-                    Animation lvSlideUp = new Animation() {
-                        @Override
-                        protected void applyTransformation(float interpolatedTime, Transformation t) {
-                            if (interpolatedTime == 1){
-                                // Do this after expanded
-                            }
-
-                            cv.getLayoutParams().height = (int) (initialHeight - (distanceToCollapse * interpolatedTime));
-                            cv.requestLayout();
-                        }
-
-                        @Override
-                        public boolean willChangeBounds() {
-                            return true;
-                        }
-                    };
-                    lvSlideDown.setDuration(500);
-                    lvSlideUp.setDuration(500);
-                    //Animation lvSlideDown = AnimationUtils.loadAnimation(cv.getContext(),R.anim.lv_slide_down);
-                    //Animation lvSlideUp = AnimationUtils.loadAnimation(cv.getContext(),R.anim.lv_slide_up);
-                    */
                     if (tvRecipe.getVisibility()== View.GONE)
                     {
 

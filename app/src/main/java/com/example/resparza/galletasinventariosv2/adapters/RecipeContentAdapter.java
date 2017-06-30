@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.transition.TransitionManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +14,10 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.resparza.galletasinventariosv2.MainActivity;
@@ -51,6 +55,8 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         final Recipe recipe = lItems.get(position);
+        final Animation slideUp = AnimationUtils.loadAnimation(this.context,R.anim.slide_up);
+        final Animation slideDown = AnimationUtils.loadAnimation(this.context,R.anim.slide_down);
 
         //holder.imageRecipe.setImageDrawable(mRecipePictures[1]);
         if(recipe == null){
@@ -60,22 +66,34 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
             holder.imageRecipe.setImageURI(Uri.fromFile(new File(recipe.getRecipeImagePath())));
         }else{
             holder.imageRecipe.setVisibility(View.GONE);
+            holder.recipeName.setBackgroundResource(R.drawable.primary_round_corner);
+            holder.recipeName.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            holder.recipeName.setPadding(25,15,25,15);
+            holder.recipeName.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         }
 
         holder.recipeName.setText(recipe.getRecipeName());
         holder.recipeCost.setText(String.valueOf(recipe.getRecipeCost(context)));
-        //holder.recipeName.setText(recipeNames[position % recipeNames.length]);
+        holder.products.setText(recipe.getProducts());
         holder.recipeCardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
                 CardView cv = (CardView)v;
                 RecyclerView rv = (RecyclerView)v.getParent();
+                TextView tvProducts = (TextView) cv.findViewById(R.id.txtProducts);
                 toggleSelection(position);
                 if(isToggleSelection(position)){
                     cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
+                    TransitionManager.beginDelayedTransition(cv);
+                    tvProducts.setVisibility(View.VISIBLE);
+                    tvProducts.startAnimation(slideDown);
+
 
                 }else{
                     cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
+                    tvProducts.startAnimation(slideUp);
+                    tvProducts.setVisibility(View.GONE);
+                    TransitionManager.beginDelayedTransition(cv);
 
                 }
                 displayFloatingActionButtons();

@@ -33,6 +33,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:11.0.1'
     compile 'com.google.android.gms:play-services:11.0.1'
     compile 'com.github.sundeepk:compact-calendar-view:2.0.1'
+    compile 'com.github.amlcurran.showcaseview:library:5.4.3'
 
     testCompile 'junit:junit:4.12'
 }

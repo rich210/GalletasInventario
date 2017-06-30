@@ -92,6 +92,20 @@ public class RecipeProductDBAdapter {
         return this.mDb.delete(RECIPE_PRODUCT_TABLE, whereClause.toString(), null) > 0; //$NON-NLS-1$ //add both columns to where
     }
 
+    public boolean deleteRecipeProductByRecipeIds(long recipeIds[], SQLiteDatabase mDb) {
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append(RECIPE_ID + " IN (");
+        for (int i = 0; i <= recipeIds.length- 1; i++) {
+            if (i < recipeIds.length - 1)
+                whereClause.append(recipeIds[i] + ",");
+            else
+                whereClause.append(recipeIds[i]);
+        }
+        whereClause.append(")");
+
+        return mDb.delete(RECIPE_PRODUCT_TABLE, whereClause.toString(), null) > 0; //$NON-NLS-1$ //add both columns to where
+    }
+
     public boolean deleteRecipeProductByProductId(long productId) {
 
         return this.mDb.delete(RECIPE_PRODUCT_TABLE, PRODUCT_ID + "=" + productId, null) > 0; //$NON-NLS-1$
@@ -116,8 +130,9 @@ public class RecipeProductDBAdapter {
 
     public List<RecipeProduct> getAllItemsByRecipeId(long recipeId) {
         List<RecipeProduct> recipeProducts = new ArrayList<RecipeProduct>();
-        String selectQuery = "SELECT  * FROM " + RECIPE_PRODUCT_TABLE + " WHERE "
-                + RECIPE_ID + " = " + recipeId;
+        String selectQuery = "SELECT  t1.*,t2."+ProductDBAdapter.PRODUCT_NAME+" FROM " + RECIPE_PRODUCT_TABLE + " t1 " +
+                "JOIN "+ProductDBAdapter.PRODUCT_TABLE +" t2 on t1."+PRODUCT_ID+" = t2."+ProductDBAdapter.PRODUCT_ID+" " +
+                "WHERE t1."+ RECIPE_ID + " = " + recipeId;
 
         //Log.e(LOG, selectQuery);
 
@@ -140,10 +155,10 @@ public class RecipeProductDBAdapter {
         return orderRecipes;
     }
 
-    public boolean updateItem(RecipeProduct recipeProduct) {
+    public boolean updateItem(RecipeProduct recipeProduct,SQLiteDatabase mDb) {
 
         ContentValues values = itemToValues(recipeProduct, true);
-        return this.mDb.update(RECIPE_PRODUCT_TABLE, values, RECIPE_ID + "=" + recipeProduct.getRecipeId() +" and " + PRODUCT_ID + "=" + recipeProduct.getProductId(), null) >0;
+        return mDb.update(RECIPE_PRODUCT_TABLE, values, RECIPE_ID + "=" + recipeProduct.getRecipeId() +" and " + PRODUCT_ID + "=" + recipeProduct.getProductId(), null) >0;
     }
 
     public List<RecipeProduct> obtainListOrderRecipe(Cursor c){
@@ -167,6 +182,7 @@ public class RecipeProductDBAdapter {
         recipeProduct.setProductId(c.getInt(c.getColumnIndex(PRODUCT_ID)));
         recipeProduct.setProductQuantity(c.getInt(c.getColumnIndex(PRODUCT_QUANTITY)));
         recipeProduct.setMeasureTypeId(c.getLong(c.getColumnIndex(MEASUREMENT_TYPE_ID)));
+        recipeProduct.setProductName(c.getString(c.getColumnIndex(ProductDBAdapter.PRODUCT_NAME)));
         return recipeProduct;
 
     }

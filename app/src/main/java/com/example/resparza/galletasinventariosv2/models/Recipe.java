@@ -148,6 +148,17 @@ public class Recipe {
         this.recipeInstructions = recipeInstructions;
     }
 
+    public String getProducts(){
+        StringBuffer products = new StringBuffer();
+        for (RecipeProduct recipeProduct: this.recipeProducts) {
+            if(!products.toString().isEmpty()){
+                products.append(" \n");
+            }
+            products.append(recipeProduct.getProductName());
+        }
+        return products.toString();
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +

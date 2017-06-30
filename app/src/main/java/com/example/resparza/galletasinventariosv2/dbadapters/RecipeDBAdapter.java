@@ -98,7 +98,7 @@ public class RecipeDBAdapter {
         whereClause.append(RECIPE_ID + " IN (");
         try {
             this.mDb.beginTransaction();
-            recipeProductDBAdapter.open();
+            //recipeProductDBAdapter.open();
             for (int i = 0; i <= recipeIds.length- 1; i++) {
                 if (i < recipeIds.length - 1)
                     whereClause.append(recipeIds[i] + ",");
@@ -111,14 +111,15 @@ public class RecipeDBAdapter {
                 Log.e(TAG, "Error tryinn to delete in tbl_recipes");
                 return isDeleted;
             }
-            isDeleted = recipeProductDBAdapter.deleteRecipeProductByRecipeIds(recipeIds);
+            isDeleted = recipeProductDBAdapter.deleteRecipeProductByRecipeIds(recipeIds, this.mDb);
             if (!isDeleted)
                 Log.e(TAG, "Error tryinn to delete in tbl_recipe_product");
-            recipeProductDBAdapter.close();
+            //recipeProductDBAdapter.close();
              //$NON-NLS-1$
             this.mDb.setTransactionSuccessful();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG, "deleteItemsByIds: Error"+e.getMessage(),e.getCause());
         }
         this.mDb.endTransaction();
         return isDeleted;
@@ -170,21 +171,22 @@ public class RecipeDBAdapter {
             isRecipeUpdated = this.mDb.update(RECIPE_TABLE, values, RECIPE_ID + "=" + recipe.getRecipeId(), null) > 0;
             if (isRecipeUpdated){
                 RecipeProductDBAdapter recipeProductDBAdapter = new RecipeProductDBAdapter(mCtx);
-                recipeProductDBAdapter.open();
+                //recipeProductDBAdapter.open();
                 for (RecipeProduct recipeProduct: recipeProducts) {
-                    isRecipeUpdated = recipeProductDBAdapter.updateItem(recipeProduct);
+                    isRecipeUpdated = recipeProductDBAdapter.updateItem(recipeProduct, this.mDb);
                     if (!isRecipeUpdated){
                         Log.e(TAG,"Error trying to insert recipe product");
                         break;
                     }
                 }
-                recipeProductDBAdapter.close();
+                //recipeProductDBAdapter.close();
             }else {
                 Log.e(TAG, "updateItem: Error updating recipe");
             }
             this.mDb.setTransactionSuccessful();
         }catch (Exception e){
             Log.e(TAG, "updateItem: Error"+e.getMessage(),e.getCause());
+            e.printStackTrace();
         }
         this.mDb.endTransaction();
         return isRecipeUpdated;

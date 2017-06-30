@@ -9,6 +9,7 @@ public class RecipeProduct {
     private long productId;
     private long measureTypeId;
     private float productQuantity;
+    private String productName;
 
 
     public RecipeProduct() {
@@ -58,5 +59,13 @@ public class RecipeProduct {
 
     public void setMeasureTypeId(long measureTypeId) {
         this.measureTypeId = measureTypeId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

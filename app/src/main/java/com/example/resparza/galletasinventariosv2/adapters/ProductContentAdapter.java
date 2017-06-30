@@ -63,11 +63,11 @@ public class ProductContentAdapter extends RecyclerView.Adapter<ProductContentAd
                         RecyclerView rv = (RecyclerView)v.getParent();
                         toggleSelection(position);
                         if(isToggleSelection(position)){
-                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundSecondary));
+                            cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
 
                         }else{
                             if (product.isLowerThanMin()){
-                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.colorSecundaryAccent));
+                                cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemProductLowerThanMin));
                             }else {
                                 cv.setCardBackgroundColor(ContextCompat.getColor(v.getContext(), R.color.itemListBackgroundPrimary));
                             }

@@ -8,6 +8,7 @@ import android.content.res.Resources;
 import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
@@ -33,6 +34,9 @@ import com.example.resparza.galletasinventariosv2.dbadapters.ProductDBAdapter;
 import com.example.resparza.galletasinventariosv2.models.Order;
 import com.example.resparza.galletasinventariosv2.models.Product;
 import com.example.resparza.galletasinventariosv2.views.orders.FormOrder;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.SimpleShowcaseEventListener;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.EventsContainer;
 import com.github.sundeepk.compactcalendarview.domain.Event;
@@ -192,6 +196,27 @@ public class Main extends Fragment {
             }
         });
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        new ShowcaseView.Builder(getActivity())
+                .withMaterialShowcase()
+                //.setStyle()
+                .setTarget(new ViewTarget(calendarView))
+                //.hideOnTouchOutside()
+                .setContentTitle("Calendario")
+                .setContentText("Aqui se pueden ver todo los pedidos por mes")
+                /*.setShowcaseEventListener(new SimpleShowcaseEventListener() {
+
+                    @Override
+                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+                        ((MainActivity) getActivity()).onHiddenFirstShowcase();
+                    }
+
+                })*/
+                .build();
     }
 
     private void initFloatingActionButtons(){
