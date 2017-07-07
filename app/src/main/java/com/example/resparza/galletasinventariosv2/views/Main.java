@@ -51,6 +51,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import static android.content.Context.MODE_PRIVATE;
+import static com.example.resparza.galletasinventariosv2.MainActivity.APPNAME;
+
 /*
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -90,6 +93,7 @@ public class Main extends Fragment {
     private SimpleDateFormat dateFormatForMonth = new SimpleDateFormat("MMM - yyyy", Locale.getDefault());
     private SimpleDateFormat dateFormatForDisplaying = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.getDefault());
     private String[] dayColumnNames = {"Lun","Mar","Mie","Jue","Vie","Sab","Dom"};
+
 
 
 
@@ -201,22 +205,45 @@ public class Main extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        new ShowcaseView.Builder(getActivity())
-                .withMaterialShowcase()
-                //.setStyle()
-                .setTarget(new ViewTarget(calendarView))
-                //.hideOnTouchOutside()
-                .setContentTitle("Calendario")
-                .setContentText("Aqui se pueden ver todo los pedidos por mes")
-                /*.setShowcaseEventListener(new SimpleShowcaseEventListener() {
+        if (MainActivity.prefs.getBoolean("mainfirsttrun", true)) {
+            // Do first run stuff here then set 'firstrun' as false
+            // using the following line to edit/commit prefs
 
-                    @Override
-                    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
-                        ((MainActivity) getActivity()).onHiddenFirstShowcase();
-                    }
+            //Calendar´s buttons instruction
+            new ShowcaseView.Builder(getActivity())
+                    .withMaterialShowcase()
+                    .setStyle(R.style.CustomShowcaseTheme)
+                    .setTarget(new ViewTarget(btnNextMonth))
+//                    .setShowcaseEventListener()
+                    //.hideOnTouchOutside()
+                    .setContentTitle("Botones del calendario")
+                    .setContentText("Estos botones sirven para cambiar de mes del calendario")
+                    .build();
 
-                })*/
-                .build();
+            //Instructions for calendar
+            new ShowcaseView.Builder(getActivity())
+                    .withMaterialShowcase()
+                    //.setStyle()
+                    .setTarget(new ViewTarget(calendarView))
+                    //.hideOnTouchOutside()
+                    .setContentTitle("Calendario")
+                    .setContentText("Aqui se pueden ver todo los pedidos por mes, pasando el dedo de un costado a otro se puede cambiar el mes")
+                    .build();
+
+            //List instructions
+            new ShowcaseView.Builder(getActivity())
+                    .withMaterialShowcase()
+                    //.setStyle()
+                    .setTarget(new ViewTarget(calendarView))
+                    //.hideOnTouchOutside()
+                    .setContentTitle("Lista")
+                    .setContentText("En esta parte de la pantalla se mostrara una lista con los ingredientes faltantes para una orden, o los ingredientes que se estan acabando")
+                    .build();
+
+            //MainActivity.prefs.edit().putBoolean("mainfirsttrun", false).commit();
+
+        }
+
     }
 
     private void initFloatingActionButtons(){

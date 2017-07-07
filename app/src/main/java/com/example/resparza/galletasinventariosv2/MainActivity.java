@@ -1,6 +1,7 @@
 package com.example.resparza.galletasinventariosv2;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ import java.sql.SQLException;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static final String TAG = "MainActivity";
+    public static final String APPNAME = "com.example.resparza.galletasinventario2";
 
     private static FloatingActionButton afab;
     private static FloatingActionButton dfab;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     private static boolean isDfabOpen = false;
     private static boolean isEfabOpen = false;
     private static boolean isAfabOpen = false;
+    public static SharedPreferences prefs = null;
     private DBAdapter db;
 
 
@@ -58,6 +61,7 @@ public class MainActivity extends AppCompatActivity
         String adAppId = "ca-app-pub-9102302636499642~7518001410";
         //String adAppId = "ca-app-pub-3940256099942544/6300978111";
         MobileAds.initialize(this, adAppId);
+        prefs = getSharedPreferences(APPNAME, MODE_PRIVATE);
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("95775FA647BCF103AB1894D2E28F56A6") //Delete this after test
@@ -112,6 +116,11 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (mAdView != null) {
             mAdView.resume();
+        }
+        if (prefs.getBoolean("firstrun", true)) {
+            // Do first run stuff here then set 'firstrun' as false
+            // using the following line to edit/commit prefs
+            prefs.edit().putBoolean("firstrun", false).commit();
         }
     }
 

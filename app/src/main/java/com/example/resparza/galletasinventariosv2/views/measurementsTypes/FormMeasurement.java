@@ -1,6 +1,7 @@
 package com.example.resparza.galletasinventariosv2.views.measurementsTypes;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,10 +16,13 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.resparza.galletasinventariosv2.MainActivity;
 import com.example.resparza.galletasinventariosv2.R;
 import com.example.resparza.galletasinventariosv2.adapters.SpinnerMeasureTypesAdapter;
 import com.example.resparza.galletasinventariosv2.dbadapters.MeasureTypeDBAdapter;
 import com.example.resparza.galletasinventariosv2.models.MeasureType;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -38,6 +42,8 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
     //private MeasureType measureType;
     private MeasureTypeDBAdapter mAdapter;
     private boolean isUpdate;
+    public static final String APPNAME = "com.example.resparza.galletasinventario2";
+    public static SharedPreferences prefs = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
         Intent intent = getIntent();
         initView();
         String tittle = getResources().getString(R.string.measurementFormAddTitle);
+        prefs = getSharedPreferences(APPNAME, MODE_PRIVATE);
 
         //Adding Measurement types to the spinner
         mAdapter = new MeasureTypeDBAdapter(getApplicationContext());
@@ -68,6 +75,22 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (prefs.getBoolean("formMeasurementFirstRun", true)) {
+            new ShowcaseView.Builder(this)
+                    .withMaterialShowcase()
+                    .setStyle(R.style.CustomShowcaseTheme)
+                    .setTarget(new ViewTarget(txtMeasureTypeName))
+                    //.hideOnTouchOutside()
+                    .setContentTitle("Nombre de la medida")
+                    .setContentText("Nombre completo que llevara la unidad de la medida ej. Pieza, Litro, Cuchara pequeña etc..")
+                    .build();
+            //prefs.edit().putBoolean("mainfirstrun", false).commit();
+        }
     }
 
     private void initView(){

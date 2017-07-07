@@ -45,11 +45,15 @@
             android:layout_height="wrap_content"
             android:text="Productos"
             android:textSize="15dp"
-            android:padding="3dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingRight="25dp"
+            android:paddingLeft="25dp"
             android:layout_marginTop="8dp"
+            android:layout_marginLeft="30dp"
             android:layout_below="@id/txtRecipeName"
             android:layout_alignParentLeft="true"
-            android:visibility="visible"
+            android:visibility="gone"
             android:textColor="@color/colorPrimaryText"
             android:background="@drawable/primary_round_corner"/>
 
