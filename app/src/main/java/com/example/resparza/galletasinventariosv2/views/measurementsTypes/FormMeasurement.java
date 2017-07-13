@@ -80,6 +80,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
+        /*
         if (prefs.getBoolean("formMeasurementFirstRun", true)) {
             new ShowcaseView.Builder(this)
                     .withMaterialShowcase()
@@ -90,7 +91,7 @@ public class FormMeasurement extends AppCompatActivity implements View.OnClickLi
                     .setContentText("Nombre completo que llevara la unidad de la medida ej. Pieza, Litro, Cuchara pequeña etc..")
                     .build();
             //prefs.edit().putBoolean("mainfirstrun", false).commit();
-        }
+        }*/
     }
 
     private void initView(){

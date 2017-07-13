@@ -205,6 +205,7 @@ public class Main extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        /*
         if (MainActivity.prefs.getBoolean("mainfirsttrun", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
@@ -243,7 +244,7 @@ public class Main extends Fragment {
             //MainActivity.prefs.edit().putBoolean("mainfirsttrun", false).commit();
 
         }
-
+*/
     }
 
     private void initFloatingActionButtons(){

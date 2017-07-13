@@ -225,7 +225,7 @@ public class OrderDBAdapter {
         initialValues.put(SELL_PRICE, order.getSellPrice());
         initialValues.put(EVENT_ID,order.getEventId());
         initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
-        if (isUpdate) {
+        if (!isUpdate) {
             initialValues.put(CREATED_ON, sdf.format(new Date(0)));
         }
         return initialValues;

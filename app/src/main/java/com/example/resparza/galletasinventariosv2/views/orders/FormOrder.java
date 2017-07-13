@@ -222,6 +222,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                 double totalRecipes = Double.valueOf(tvTotalRecipes.getText().toString());
                 Recipe recipe = (Recipe)spinner.getSelectedItem();
                 OrderRecipe orderRecipe = new OrderRecipe(recipe.getRecipeId(),quantity, costPerUnit,totalRecipes);
+                orderRecipe.setRecipeName(recipe.getRecipeName());
                 if(isUpdate){
                     orderRecipe.setOrderId(orderId);
                 }
@@ -541,8 +542,8 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
     public long insertCalendarEvent(Order order){
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         long calendarId = Long.valueOf(sharedPref.getString("pref_calendar_account","1"));
-        int daysBefore = sharedPref.getInt("pref_days_reminder", 1);
-        int notificationTime = sharedPref.getInt("pref_time_reminder", 8);
+        int daysBefore = Integer.valueOf(sharedPref.getString("pref_days_reminder", "1"));
+        int notificationTime = Integer.valueOf( sharedPref.getString("pref_time_reminder", "8"));
         long startMillis = 0;
         long endMillis = 0;
         Calendar time = Calendar.getInstance();
@@ -562,13 +563,14 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         values.put(CalendarContract.Events.CALENDAR_ID, calendarId);
         values.put(CalendarContract.Events.EVENT_TIMEZONE, "America/Mexico_City");
         Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+        Log.d(TAG, "insertCalendarEvent: OrderClientName:"+ order.getClientName() + " orderDescruiption: "+order.getOrderDescription());
 
         long eventID = Long.parseLong(uri.getLastPathSegment());
         if(eventID>0){
             Log.d(TAG, "insertCalendarEvent: event "+eventID);
         }
         ContentValues reminderValues = new ContentValues();
-        reminderValues.put(CalendarContract.Reminders.MINUTES, (((60*24)*daysBefore)+notificationTime));
+        reminderValues.put(CalendarContract.Reminders.MINUTES, (((60*24)*daysBefore)+(60*notificationTime)));
         reminderValues.put(CalendarContract.Reminders.EVENT_ID, eventID);
         reminderValues.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
         uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);
