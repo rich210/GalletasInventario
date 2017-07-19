@@ -13,6 +13,7 @@ import com.example.resparza.galletasinventariosv2.models.MeasureType;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -148,6 +149,7 @@ public class MeasureTypeDBAdapter implements DataSourceDBAdapter {
     }
 
     private ContentValues itemToValues(Object item, boolean isUpdate) {
+        Calendar c = Calendar.getInstance();
         MeasureType measureType = (MeasureType)item;
         ContentValues values = new ContentValues();
         values.put(MEASURE_NAME, measureType.getMeasureTypeName());
@@ -155,9 +157,9 @@ public class MeasureTypeDBAdapter implements DataSourceDBAdapter {
         values.put(MEASURE_EQUIVALENCY_ID,measureType.getMeasureEquivalencyId());
         values.put(QUANTITY_EQUIVALENCY,measureType.getQuantityEquivalency());
         values.put(IS_MEASURE_BASE,(measureType.isMeasureBase())?1:0);
-        values.put(UPDATED_ON, sdf.format(new Date(0)));
+        values.put(UPDATED_ON, sdf.format(c.getTime()));
         if (!isUpdate) {
-            values.put(CREATED_ON, sdf.format(new Date(0)));
+            values.put(CREATED_ON, sdf.format(c.getTime()));
         }
         return values;
     }

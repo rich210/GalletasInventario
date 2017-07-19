@@ -14,6 +14,7 @@ import com.example.resparza.galletasinventariosv2.models.Product;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -212,15 +213,16 @@ public class ProductDBAdapter {
     }
 
     private ContentValues itemToValues(Product product, boolean isUpdate) {
+        Calendar c = Calendar.getInstance();
         ContentValues initialValues = new ContentValues();
         initialValues.put(PRODUCT_NAME, product.getProductName());
         initialValues.put(COST_PER_UNIT, product.getCostPerUnit());
         initialValues.put(MEASURE_TYPE_ID, product.getMeasureType().getMeasureTypeId());
         initialValues.put(QUANTITY, product.getQuantity());
         initialValues.put(PRODUCT_MIN,product.getProductMin());
-        initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
+        initialValues.put(UPDATED_ON, sdf.format(c.getTime()));
         if (!isUpdate) {
-            initialValues.put(CREATED_ON, sdf.format(new Date(0)));
+            initialValues.put(CREATED_ON, sdf.format(c.getTime()));
         }
         return initialValues;
     }

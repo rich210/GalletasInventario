@@ -12,6 +12,7 @@ import com.example.resparza.galletasinventariosv2.models.RecipeProduct;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -188,12 +189,13 @@ public class RecipeProductDBAdapter {
     }
 
     private ContentValues itemToValues(RecipeProduct recipeProduct, boolean isUpdate) {
+        Calendar c = Calendar.getInstance();
         ContentValues initialValues = new ContentValues();
         initialValues.put(PRODUCT_QUANTITY, recipeProduct.getProductQuantity());
-        initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
+        initialValues.put(UPDATED_ON, sdf.format(c.getTime()));
         initialValues.put(MEASUREMENT_TYPE_ID,recipeProduct.getMeasureTypeId());
         if (!isUpdate) {
-            initialValues.put(CREATED_ON, sdf.format(new Date(0)));
+            initialValues.put(CREATED_ON, sdf.format(c.getTime()));
             initialValues.put(RECIPE_ID, recipeProduct.getRecipeId());
             initialValues.put(PRODUCT_ID, recipeProduct.getProductId());
         }

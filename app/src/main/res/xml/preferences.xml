@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-     >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:title="Notificaciones">
         <ListPreference
@@ -14,10 +14,20 @@
             android:summary="Dias anticipados para notificar sobre el pedido"
             android:title="No. de dias notificacion"
             android:inputType="number"/>
+
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Hora de notificacion">
         <EditTextPreference
-            android:key="pref_time_reminder"
-            android:summary="Hora de la notificación del pedido"
+            android:key="pref_time_hours_reminder"
+            android:summary="Hora de la notificación del pedido (0-24)"
             android:title="Hora para notificación"
+            android:inputType="number"/>
+        <EditTextPreference
+            android:key="pref_time_minutes_reminder"
+            android:summary="Minutos de la notificación del pedido (0-60)"
+            android:title="Minutos para notificación"
             android:inputType="number"/>
     </PreferenceCategory>
 

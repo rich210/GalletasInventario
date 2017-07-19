@@ -15,6 +15,7 @@ import com.example.resparza.galletasinventariosv2.models.RecipeProduct;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -215,6 +216,7 @@ public class RecipeDBAdapter {
     }
 
     private ContentValues itemToValues(Recipe recipe, boolean isUpdate) {
+        Calendar c = Calendar.getInstance();
         ContentValues values = new ContentValues();
         values.put(RECIPE_NAME, recipe.getRecipeName());
         //values.put(MEASURE_TYPE_ID, recipe.getMeasureType().getMeasureTypeId());
@@ -223,9 +225,9 @@ public class RecipeDBAdapter {
         values.put(IMAGE_PATH,recipe.getRecipeImagePath());
         values.put(RECIPE_INSTRUCTIONS,recipe.getRecipeInstructions());
 
-        values.put(UPDATED_ON, sdf.format(new Date(0)));
-        if (isUpdate) {
-            values.put(CREATED_ON, sdf.format(new Date(0)));
+        values.put(UPDATED_ON, sdf.format(c.getTime()));
+        if (!isUpdate) {
+            values.put(CREATED_ON, sdf.format(c.getTime()));
         }
         return values;
     }

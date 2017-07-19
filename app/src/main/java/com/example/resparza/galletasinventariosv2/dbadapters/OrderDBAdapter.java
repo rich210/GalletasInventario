@@ -215,6 +215,7 @@ public class OrderDBAdapter {
     }
 
     private ContentValues itemToValues(Order order, boolean isUpdate) {
+        Calendar c = Calendar.getInstance();
         ContentValues initialValues = new ContentValues();
         initialValues.put(ORDER_NAME, order.getOrderName());
         initialValues.put(CLIENT_NAME, order.getClientName());
@@ -224,9 +225,9 @@ public class OrderDBAdapter {
         initialValues.put(TOTAL, order.getTotal());
         initialValues.put(SELL_PRICE, order.getSellPrice());
         initialValues.put(EVENT_ID,order.getEventId());
-        initialValues.put(UPDATED_ON, sdf.format(new Date(0)));
+        initialValues.put(UPDATED_ON, sdf.format(c.getTime()));
         if (!isUpdate) {
-            initialValues.put(CREATED_ON, sdf.format(new Date(0)));
+            initialValues.put(CREATED_ON, sdf.format(c.getTime()));
         }
         return initialValues;
     }

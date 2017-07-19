@@ -21,7 +21,7 @@ public class DBAdapter {
     public static final String DATABASE_NAME = "cookieManager"; //$NON-NLS-1$
     public static final String TAG = "DBAdapter";
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 8;
 
 
     private static final String CREATE_TABLE_TBL_PRODUCTS =
@@ -58,7 +58,7 @@ public class DBAdapter {
                     + OrderDBAdapter.ORDER_STATUS+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.SELL_PRICE+" REAL," //$NON-NLS-1$
                     + OrderDBAdapter.TOTAL+" REAL," //$NON-NLS-1$
-                    + OrderDBAdapter.EVENT_ID+" REAL"
+                    + OrderDBAdapter.EVENT_ID+" REAL,"
                     + OrderDBAdapter.CREATED_ON+" TEXT," //$NON-NLS-1$
                     + OrderDBAdapter.UPDATED_ON+" TEXT);"; //$NON-NLS-1$
 

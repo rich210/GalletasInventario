@@ -8,8 +8,8 @@ android {
         applicationId "com.example.resparza.galletasinventariosv2"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 6
-        versionName "1.5"
+        versionCode 8
+        versionName "1.7"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
     }

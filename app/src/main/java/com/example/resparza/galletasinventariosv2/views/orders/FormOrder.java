@@ -514,20 +514,22 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         public void afterTextChanged(Editable s) {
             switch (this.textChanged){
                 case 1:
-                    String sQuantity = this.tvRecipeQuantity.getText().toString();
-                    String sRecipePortion = this.tvRecipePortions.getText().toString();
-                    String sCostPerPortion = this.tvCostPerPortions.getText().toString();
-                    Log.d(TAG, "afterTextChanged: "+sRecipePortion + " " + sCostPerPortion);
-                    double quantity = Double.valueOf((sQuantity.isEmpty())?"0": sQuantity);
-                    int recipePortion = Integer.valueOf((sRecipePortion.isEmpty())?"0": sRecipePortion);
-                    double costPerPortion = Double.valueOf((sCostPerPortion.isEmpty())?"0":sCostPerPortion);
+                    if(this.tvRecipeQuantity.getText().toString().trim().length()>0){
+                        String sQuantity = this.tvRecipeQuantity.getText().toString();
+                        String sRecipePortion = this.tvRecipePortions.getText().toString();
+                        String sCostPerPortion = this.tvCostPerPortions.getText().toString();
+                        Log.d(TAG, "afterTextChanged: "+sRecipePortion + " " + sCostPerPortion);
+                        double quantity = Double.valueOf((sQuantity.isEmpty())?"0": sQuantity);
+                        int recipePortion = Integer.valueOf((sRecipePortion.isEmpty())?"0": sRecipePortion);
+                        double costPerPortion = Double.valueOf((sCostPerPortion.isEmpty())?"0":sCostPerPortion);
 
-                    double totalPortions = quantity*recipePortion;
-                    double totalCost = quantity*costPerPortion;
+                        double totalPortions = quantity*recipePortion;
+                        double totalCost = quantity*costPerPortion;
 
-                    this.tvTotalPortions.setText(String.valueOf(totalPortions));
-                    this.tvTotalCost.setText(String.valueOf(totalCost));
-                    FormOrder.this.getTotalCost();
+                        this.tvTotalPortions.setText(String.valueOf(totalPortions));
+                        this.tvTotalCost.setText(String.valueOf(totalCost));
+                        FormOrder.this.getTotalCost();
+                    }
                     break;
                 case 2:
                     FormOrder.this.getTotalGain();
@@ -543,7 +545,8 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         long calendarId = Long.valueOf(sharedPref.getString("pref_calendar_account","1"));
         int daysBefore = Integer.valueOf(sharedPref.getString("pref_days_reminder", "1"));
-        int notificationTime = Integer.valueOf( sharedPref.getString("pref_time_reminder", "8"));
+        int notificationHourTime = Integer.valueOf( sharedPref.getString("pref_time_hours_reminder", "8"));
+        int notificationMinTime = Integer.valueOf( sharedPref.getString("pref_time_minutes_reminder", "0"));
         long startMillis = 0;
         long endMillis = 0;
         Calendar time = Calendar.getInstance();
@@ -569,11 +572,23 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         if(eventID>0){
             Log.d(TAG, "insertCalendarEvent: event "+eventID);
         }
+        //Reminder for user configuration
         ContentValues reminderValues = new ContentValues();
-        reminderValues.put(CalendarContract.Reminders.MINUTES, (((60*24)*daysBefore)+(60*notificationTime)));
+        reminderValues.put(CalendarContract.Reminders.MINUTES, (((1440)*daysBefore)-(60*notificationHourTime)-notificationMinTime));
         reminderValues.put(CalendarContract.Reminders.EVENT_ID, eventID);
         reminderValues.put(CalendarContract.Reminders.METHOD, CalendarContract.Reminders.METHOD_ALERT);
         uri = cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);
+
+        //Reminder one day early
+        reminderValues.remove(CalendarContract.Reminders.MINUTES);
+        reminderValues.put(CalendarContract.Reminders.MINUTES, 1440-(60*notificationHourTime)-notificationMinTime);
+        cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);
+        //Reminder the day of delivery
+        /*
+        reminderValues.remove(CalendarContract.Reminders.MINUTES);
+        reminderValues.put(CalendarContract.Reminders.MINUTES, -(60*notificationHourTime)-notificationMinTime);
+        cr.insert(CalendarContract.Reminders.CONTENT_URI, reminderValues);
+        */
         return eventID;
     }
 
