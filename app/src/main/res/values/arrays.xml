@@ -28,4 +28,8 @@
         <item>Cancelado</item>
         <item>Espera confirmacion</item>
     </string-array>
+    <string-array name="orderSellOption">
+        <item>pz.</item>
+        <item>total</item>
+    </string-array>
 </resources>

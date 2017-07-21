@@ -79,6 +79,7 @@ public class Main extends Fragment {
     public static final String EXTRA_ADDED_ORDER = "extra_key_added_order";
     public static final String EXTRA_SELECTED_ORDER_ID = "extra_key_selected_order_id";
     public static final String IS_UPDATE = "isUpdate";
+    public static final String EXTRA_SELECTED_DATE = "extra_key_selected_date";
 
     private FloatingActionButton afab;
     private FloatingActionButton dfab;
@@ -156,9 +157,11 @@ public class Main extends Fragment {
         calendarView.setDayColumnNames(dayColumnNames);
         calendarView.addEvents(getEvents(recyclerView.getContext(),Calendar.getInstance().getTime()));
         calendarView.setBackgroundColor(ResourcesCompat.getColor(getResources(),R.color.listBackground,null));
+        calendarView.shouldSelectFirstDayOfMonthOnScroll(false);
         calendarView.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
             public void onDayClick(Date dateClicked) {
+                //TODO: Add date information to the form
                                 Intent intent = new Intent(getActivity(), FormOrder.class);
                 List<Event> events = calendarView.getEvents(dateClicked);
                 if(events.size()== 1){
@@ -170,8 +173,16 @@ public class Main extends Fragment {
                 }else if (events.size()>1){
                     showOrderListDialog(events);
                 }else{
-                    intent.putExtra(IS_UPDATE,false);
-                    startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
+                    if(!(new Date().after(dateClicked))){
+                        intent.putExtra(IS_UPDATE,false);
+                        intent.putExtra(EXTRA_SELECTED_DATE, dateClicked);
+                        startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
+                    }
+                    else{
+                        Toast.makeText(recyclerView.getContext(),R.string.mainDateBefore,Toast.LENGTH_LONG).show();
+                        Log.d(TAG, "onDayClick: Can´t add new order in this date" + dateClicked.toString());
+                    }
+
                 }
 
                 tvMonth.setText(dateFormatForMonth.format(dateClicked));

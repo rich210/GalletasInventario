@@ -61,5 +61,7 @@
     <string name="menuOrders">Pedidos</string>
     <string name="menuHome">Principal</string>
 
+    <string name="mainDateBefore">No se puede selecionar un dia anterior a la fecha actual</string>
+
 
 </resources>

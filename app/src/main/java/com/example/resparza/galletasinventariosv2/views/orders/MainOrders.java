@@ -54,6 +54,7 @@ public class MainOrders extends Fragment implements View.OnClickListener {
     public static final String EXTRA_ADDED_ORDER = "extra_key_added_order";
     public static final String EXTRA_SELECTED_ORDER_ID = "extra_key_selected_order_id";
     public static final String IS_UPDATE = "isUpdate";
+    public static final String EXTRA_SELECTED_DATE = "extra_key_selected_date";
 
     private FloatingActionButton afab;
     private FloatingActionButton dfab;

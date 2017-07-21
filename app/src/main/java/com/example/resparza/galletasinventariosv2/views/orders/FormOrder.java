@@ -60,6 +60,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
     private LinearLayout llRecipes;
     private ArrayList<LinearLayout> linearLayoutArray;
     private Spinner sOrderState;
+    private Spinner sSellAs;
     private TextView tvErrorSpinnerOrderState;
     private ImageButton ibAddRecipe;
     private TextView tvTotalCost;
@@ -87,6 +88,8 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         }else {
             addRecipeForm(null);
         }
+        //TODO: Add date selected from calendar
+        //Date dateSelected = intent.getExtras().get
         setTitle(tittle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -158,6 +161,25 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);*/
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.sOrderState.setAdapter(adapter);
+        this.sSellAs = (Spinner)findViewById(R.id.sSellAs);
+        ArrayAdapter sellAsOptionsAdapter = ArrayAdapter.createFromResource(this,R.array.orderSellOption,android.R.layout.simple_spinner_item);
+        sellAsOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.sSellAs.setAdapter(sellAsOptionsAdapter);
+        this.sSellAs.setSelection(1);
+        this.sSellAs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                String option = (String)parent.getItemAtPosition(position);
+                Log.d(TAG, "onItemSelected: Option:" + option.toString());
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         this.tvErrorSpinnerOrderState = (TextView)findViewById(R.id.tvErrorSpinnerOrderState);
     }
 

@@ -111,27 +111,31 @@
                     android:orientation="horizontal"
                     android:weightSum="1">
                     <TextView
-                        android:layout_width="1dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.50"
-                        android:text="Se vende a :"
+                        android:layout_weight="0.40"
+                        android:text="Se vende a:"
                         android:textSize="18dp"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryTextDark"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginLeft="20dp"
                         android:layout_marginTop="10dp"/>
                     <EditText
-                        android:layout_width="1dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.50"
-                        android:layout_marginRight="20dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="20dp"
+                        android:layout_weight="0.3"
+                        android:layout_marginTop="5dp"
                         android:hint="Venta"
                         android:focusable="false"
                         android:id="@+id/etSell"
-                        android:inputType="numberDecimal"/>
+                        android:inputType="numberDecimal"
+                        android:paddingTop="10dp"/>
+                    <Spinner
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:layout_marginTop="20dp"
+                        android:id="@+id/sSellAs"
+                        android:paddingBottom="10dp"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
