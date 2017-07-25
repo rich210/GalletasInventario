@@ -27,6 +27,8 @@ public class OrderRecipeDBAdapter {
     public static final String ORDER_ID = "order_id";
     public static final String ORDER_QUANTITY = "order_quantity";
     public static final String PRICE_PER_UNIT = "price_per_unit";
+    public static final String PRICE_SELL = "price_sell";
+    public static final String SELL_AS = "sell_ass";
     public static final String TOTAL = "total";
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";

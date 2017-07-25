@@ -161,6 +161,37 @@
             android:id="@+id/txtTotalRecipes"/>
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.40"
+            android:text="Se vende a:"
+            android:textSize="18dp"
+            android:textAlignment="center"
+            android:textColor="@color/colorPrimaryTextDark"
+            android:layout_marginTop="10dp"/>
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:layout_marginTop="5dp"
+            android:hint="Venta"
+            android:id="@+id/etSell"
+            android:inputType="numberDecimal"
+            android:paddingTop="10dp"/>
+        <Spinner
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:layout_marginTop="20dp"
+            android:id="@+id/sSellAs"
+            android:paddingBottom="10dp"/>
+    </LinearLayout>
 
     <ImageButton
         android:layout_width="match_parent"

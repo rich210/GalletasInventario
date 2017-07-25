@@ -33,7 +33,9 @@ public class OrderDBAdapter {
     public static final String CLIENT_NUMBER = "client_number";
     public static final String DELIVERY_DATE = "delivery_date";
     public static final String TOTAL = "total";
-    public static final String SELL_PRICE = "sell_price";
+    //TODO: Finish adding the set up to accept selling price for each recipe
+    //public static final String SELL_PRICE = "sell_price";
+    //public static final String SELL_AS = "sell_as";
     public static final String ORDER_STATUS = "order_status";
     public static final String EVENT_ID = "event_id";
     //public static final String GAIN = "gain";
@@ -223,7 +225,7 @@ public class OrderDBAdapter {
         initialValues.put(DELIVERY_DATE, sdf.format(order.getDeliveryDate()));
         initialValues.put(ORDER_STATUS,order.getOrderStatus());
         initialValues.put(TOTAL, order.getTotal());
-        initialValues.put(SELL_PRICE, order.getSellPrice());
+        //initialValues.put(SELL_PRICE, order.getSellPrice());
         initialValues.put(EVENT_ID,order.getEventId());
         initialValues.put(UPDATED_ON, sdf.format(c.getTime()));
         if (!isUpdate) {
@@ -246,7 +248,7 @@ public class OrderDBAdapter {
             e.printStackTrace();
         }
         order.setTotal(c.getFloat(c.getColumnIndex(TOTAL)));
-        order.setSellPrice(c.getFloat(c.getColumnIndex(SELL_PRICE)));
+        //order.setSellPrice(c.getFloat(c.getColumnIndex(SELL_PRICE)));
         order.setEventId(c.getLong(c.getColumnIndex(EVENT_ID)));
         order.setOrderStatus(c.getString(c.getColumnIndex(ORDER_STATUS)));
         if(order.getOrderStatus().equals(strings[1])){ //Open State

@@ -50,7 +50,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class FormOrder extends AppCompatActivity implements View.OnClickListener {
+public class FormOrder extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     public static final String TAG = "FormOrder";
     private TextView tvOrderId;
@@ -64,7 +64,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
     private TextView tvErrorSpinnerOrderState;
     private ImageButton ibAddRecipe;
     private TextView tvTotalCost;
-    private EditText etPriceToSell;
+    private EditText etTotalPriceToSell;
     private TextView tvGain;
     private Button btnSave;
     private boolean isUpdate;
@@ -117,70 +117,20 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         this.etClientName = (EditText)findViewById(R.id.etClientName);
         this.tvDeliveryDate = (TextView)findViewById(R.id.txtDeliveryDate);
         this.dpDeliveryDate = (DatePicker)findViewById(R.id.dpDeliveryDate);
+        this.dpDeliveryDate.setMinDate(new Date().getTime());
         this.llRecipes = (LinearLayout) findViewById(R.id.llRecipes);
         this.ibAddRecipe = (ImageButton)findViewById(R.id.btnAddRecipe);
         this.tvTotalCost = (TextView)findViewById(R.id.txtTotalCost);
-        this.etPriceToSell = (EditText)findViewById(R.id.etSell);
-        this.etPriceToSell.addTextChangedListener(new CustomTextWatcher(this.etPriceToSell,this));
         this.tvGain = (TextView)findViewById(R.id.txtGain);
         this.btnSave = (Button) findViewById(R.id.btnSaveOrder);
         this.ibAddRecipe.setOnClickListener(this);
         this.btnSave.setOnClickListener(this);
         this.sOrderState = (Spinner)findViewById(R.id.sOrderState);
         ArrayAdapter adapter = ArrayAdapter.createFromResource(this,R.array.orderStates,android.R.layout.simple_spinner_item);
-        /*final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(
-                this,R.layout.spinner_item,getResources().getStringArray(R.array.orderStates)){
-            @Override
-            public boolean isEnabled(int position){
-                if(position == 0)
-                {
-                    // Disable the first item from Spinner
-                    // First item will be use for hint
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-            @Override
-            public View getDropDownView(int position, View convertView,
-                                        ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView tv = (TextView) view;
-                if(position == 0){
-                    // Set the hint text color gray
-                    tv.setTextColor(getResources().getColor(R.color.listSecondary));
-                }
-                else {
-                    tv.setTextColor(getResources().getColor(R.color.colorPrimaryTextDark));
-                }
-                return view;
-            }
-        };
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);*/
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this.sOrderState.setAdapter(adapter);
-        this.sSellAs = (Spinner)findViewById(R.id.sSellAs);
-        ArrayAdapter sellAsOptionsAdapter = ArrayAdapter.createFromResource(this,R.array.orderSellOption,android.R.layout.simple_spinner_item);
-        sellAsOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        this.sSellAs.setAdapter(sellAsOptionsAdapter);
-        this.sSellAs.setSelection(1);
-        this.sSellAs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                String option = (String)parent.getItemAtPosition(position);
-                Log.d(TAG, "onItemSelected: Option:" + option.toString());
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
         this.tvErrorSpinnerOrderState = (TextView)findViewById(R.id.tvErrorSpinnerOrderState);
+        this.etTotalPriceToSell = (EditText)findViewById(R.id.etTotalSell);
     }
 
     @Override
@@ -228,7 +178,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
             calendar.set(year,month,day);
             deliveryDate = calendar.getTime();
             totalCost = Double.valueOf(this.tvTotalCost.getText().toString());
-            priceToSell = Double.valueOf(this.etPriceToSell.getText().toString());
+            priceToSell = Double.valueOf(this.etTotalPriceToSell.getText().toString());
             gain = Double.valueOf(this.tvGain.getText().toString());
             orderStatus = this.sOrderState.getSelectedItem().toString();
             for (int i = 0; i< this.llRecipes.getChildCount(); i++){
@@ -328,8 +278,8 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
             this.tvTotalCost.setError("No se a asignado el precio total");
             isValid = false;
         }
-        if(etPriceToSell.getText().toString().isEmpty()){
-            etPriceToSell.setError("Precio a vender es requerido");
+        if(etTotalPriceToSell.getText().toString().isEmpty()){
+            etTotalPriceToSell.setError("Precio a vender es requerido");
             isValid = false;
         }
         if (tvGain.getText().toString().isEmpty()){
@@ -360,6 +310,15 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         final TextView tvRecipeCost= (TextView)linearLayout.findViewById(R.id.txtCostPerRecipe);
         final TextView tvtotalCost= (TextView)linearLayout.findViewById(R.id.txtTotalRecipes);
         ImageButton ibRemoveRecipe = (ImageButton)linearLayout.findViewById(R.id.btnRemoveRecipe);
+        Spinner sSellAs = (Spinner)linearLayout.findViewById(R.id.sSellAs);
+        ArrayAdapter sellAsOptionsAdapter = ArrayAdapter.createFromResource(this,R.array.orderSellOption,android.R.layout.simple_spinner_item);
+        sellAsOptionsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sSellAs.setAdapter(sellAsOptionsAdapter);
+        sSellAs.setSelection(1);
+        sSellAs.setOnItemSelectedListener(this);
+        EditText etPriceToSell = (EditText)linearLayout.findViewById(R.id.etSell);
+        etPriceToSell.addTextChangedListener(new CustomTextWatcher(etPriceToSell,this));
+        etPriceToSell.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
         ibRemoveRecipe.setOnClickListener(this);
         etQuantity.setInputType(InputType.TYPE_NULL);
         SpinnerRecipeAdapter spinnerRecipeAdapter = getRecipes();
@@ -435,17 +394,37 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
             total = total + Double.valueOf((sTotalRecipeCost.isEmpty())?"0":sTotalRecipeCost);
         }
         this.tvTotalCost.setText(String.valueOf(total));
-        this.etPriceToSell.setFocusable(true);
-        this.etPriceToSell.setFocusableInTouchMode(true);
-        this.etPriceToSell.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        //this.etTotalPriceToSell.setFocusable(true);
+        //this.etTotalPriceToSell.setFocusableInTouchMode(true);
+
     }
 
     public void getTotalGain(){
         double total =0;
-        double totalCost = Double.valueOf((this.tvTotalCost.getText().toString().isEmpty())? "0": this.tvTotalCost.getText().toString());
-        double sell = Double.valueOf((this.etPriceToSell.getText().toString().isEmpty())?"0": this.etPriceToSell.getText().toString());
-        total = sell - totalCost;
-        this.tvGain.setText(String.valueOf(total));
+        double partialTotal= 0;
+        double gain = 0;
+        String sellAs = null;
+        for (int i = 0; i< this.llRecipes.getChildCount(); i++){
+            ViewGroup viewGroup = (ViewGroup)this.llRecipes.getChildAt(i);
+            Spinner sSellAs =(Spinner)viewGroup.findViewById(R.id.sSellAs);
+            if(sSellAs != null){
+                sellAs = sSellAs.getSelectedItem().toString();
+                Double etPriceToSell = Double.valueOf(((EditText)viewGroup.findViewById(R.id.etSell)).getText().toString().isEmpty()?"0":((EditText)viewGroup.findViewById(R.id.etSell)).getText().toString());
+                Double totalPortions = Double.valueOf(((TextView)viewGroup.findViewById(R.id.txtTotalPortion)).getText().toString().isEmpty()?"0":((TextView)viewGroup.findViewById(R.id.txtTotalPortion)).getText().toString());
+                if (sellAs.equals("pz")){
+                    partialTotal = etPriceToSell * totalPortions;
+                }else {
+                    partialTotal = etPriceToSell;
+                }
+            }
+
+
+
+            total = total + partialTotal;
+        }
+        this.etTotalPriceToSell.setText(String.valueOf(total));
+        gain = total - Double.valueOf( this.tvTotalCost.getText().toString().isEmpty()?"0": this.tvTotalCost.getText().toString());
+        this.tvGain.setText(String.valueOf(gain));
     }
 
     public void loadData(long id){
@@ -467,7 +446,7 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
                 addRecipeForm(orderRecipe);
             }
             this.tvTotalCost.setText(String.valueOf(order.getTotal()));
-            this.etPriceToSell.setText(String.valueOf(order.getSellPrice()));
+            this.etTotalPriceToSell.setText(String.valueOf(order.getSellPrice()));
             this.tvGain.setText(String.valueOf(order.getGain()));
             String[] strings = getResources().getStringArray(R.array.orderStates);
             int position = 0;
@@ -620,5 +599,19 @@ public class FormOrder extends AppCompatActivity implements View.OnClickListener
         Uri deleteUri = null;
         deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventId);
         int rows = getContentResolver().delete(deleteUri, null, null);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+        String option = (String)parent.getItemAtPosition(position);
+        this.getTotalGain();
+        Log.d(TAG, "onItemSelected: Option:" + option.toString());
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
