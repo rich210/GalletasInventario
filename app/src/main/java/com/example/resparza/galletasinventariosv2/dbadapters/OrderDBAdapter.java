@@ -34,11 +34,10 @@ public class OrderDBAdapter {
     public static final String DELIVERY_DATE = "delivery_date";
     public static final String TOTAL = "total";
     //TODO: Finish adding the set up to accept selling price for each recipe
-    //public static final String SELL_PRICE = "sell_price";
-    //public static final String SELL_AS = "sell_as";
+    public static final String SELL_PRICE = "sell_price";
+
     public static final String ORDER_STATUS = "order_status";
     public static final String EVENT_ID = "event_id";
-    //public static final String GAIN = "gain";
     public static final String CREATED_ON = "created";
     public static final String UPDATED_ON = "updated";
 

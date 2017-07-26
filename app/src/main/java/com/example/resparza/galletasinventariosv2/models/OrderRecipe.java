@@ -12,6 +12,8 @@ public class OrderRecipe {
     private double pricePerUnit;
     private double total;
     private String recipeName;
+    private double sellPrices;
+    private String sellAs;
 
     public OrderRecipe() {
     }
@@ -77,5 +79,21 @@ public class OrderRecipe {
 
     public void setRecipeName(String recipeName) {
         this.recipeName = recipeName;
+    }
+
+    public double getSellPrices() {
+        return sellPrices;
+    }
+
+    public void setSellPrices(double sellPrices) {
+        this.sellPrices = sellPrices;
+    }
+
+    public String getSellAs() {
+        return sellAs;
+    }
+
+    public void setSellAs(String sellAs) {
+        this.sellAs = sellAs;
     }
 }

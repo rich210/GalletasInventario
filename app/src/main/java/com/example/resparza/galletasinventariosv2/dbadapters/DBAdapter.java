@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.util.StringBuilderPrinter;
 
+import com.example.resparza.galletasinventariosv2.models.OrderRecipe;
 import com.example.resparza.galletasinventariosv2.models.Recipe;
 
 import java.sql.SQLException;
@@ -21,7 +22,7 @@ public class DBAdapter {
     public static final String DATABASE_NAME = "cookieManager"; //$NON-NLS-1$
     public static final String TAG = "DBAdapter";
 
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
 
 
     private static final String CREATE_TABLE_TBL_PRODUCTS =
@@ -80,6 +81,8 @@ public class DBAdapter {
                     + OrderRecipeDBAdapter.ORDER_QUANTITY+" INTEGER," //$NON-NLS-1$
                     + OrderRecipeDBAdapter.PRICE_PER_UNIT+" REAL," //$NON-NLS-1$
                     + OrderRecipeDBAdapter.TOTAL+" REAL," //$NON-NLS-1$
+                    + OrderRecipeDBAdapter.PRICE_SELL+" REAL," //$NON-NLS-1$
+                    + OrderRecipeDBAdapter.SELL_AS+" TEXT," //$NON-NLS-1$
                     + OrderRecipeDBAdapter.CREATED_ON+" TEXT," //$NON-NLS-1$
                     + OrderRecipeDBAdapter.UPDATED_ON+" TEXT," //$NON-NLS-1$
                     + "FOREIGN KEY (" + OrderRecipeDBAdapter.ORDER_ID + ") REFERENCES "+OrderDBAdapter.ORDER_TABLE+"("+OrderDBAdapter.ORDER_ID+"),"

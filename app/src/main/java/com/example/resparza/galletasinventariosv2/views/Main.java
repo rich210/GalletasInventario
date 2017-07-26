@@ -175,7 +175,7 @@ public class Main extends Fragment {
                 }else{
                     if(!(new Date().after(dateClicked))){
                         intent.putExtra(IS_UPDATE,false);
-                        intent.putExtra(EXTRA_SELECTED_DATE, dateClicked);
+                        intent.putExtra(EXTRA_SELECTED_DATE, dateClicked.getTime());
                         startActivityForResult(intent, REQUEST_CODE_ADD_ORDER);
                     }
                     else{

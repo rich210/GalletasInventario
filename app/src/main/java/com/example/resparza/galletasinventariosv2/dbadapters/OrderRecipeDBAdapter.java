@@ -135,6 +135,8 @@ public class OrderRecipeDBAdapter {
         initialValues.put(ORDER_QUANTITY, ordRec.getOrderQuantity());
         initialValues.put(PRICE_PER_UNIT, ordRec.getPricePerUnit());
         initialValues.put(TOTAL, ordRec.getTotal());
+        initialValues.put(SELL_AS,ordRec.getSellAs());
+        initialValues.put(PRICE_SELL,ordRec.getSellPrices());
         initialValues.put(UPDATED_ON, sdf.format(c.getTime()));
         if (!isUpdate) {
             initialValues.put(CREATED_ON, sdf.format(c.getTime()));
@@ -150,6 +152,8 @@ public class OrderRecipeDBAdapter {
         orderRecipe.setPricePerUnit(c.getFloat(c.getColumnIndex(PRICE_PER_UNIT)));
         orderRecipe.setOrderQuantity(c.getInt(c.getColumnIndex(ORDER_QUANTITY)));
         orderRecipe.setRecipeName(c.getString(c.getColumnIndex("recipe_name")));
+        orderRecipe.setSellAs(c.getString(c.getColumnIndex(SELL_AS)));
+        orderRecipe.setSellPrices(c.getFloat(c.getColumnIndex(PRICE_SELL)));
         return orderRecipe;
     }
 
