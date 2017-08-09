@@ -78,6 +78,7 @@ public class RecipeContentAdapter extends RecyclerView.Adapter<RecipeContentAdap
         holder.recipeCardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 //Toast.makeText(v.getContext(),"Clicked card view",Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onClick: " + recipe.toString());
                 CardView cv = (CardView)v;
                 RecyclerView rv = (RecyclerView)v.getParent();
                 TextView tvProducts = (TextView) cv.findViewById(R.id.txtProducts);

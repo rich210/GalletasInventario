@@ -63,7 +63,7 @@ public class RecipeDBAdapter {
     public long insertItem(Recipe recipe, List<RecipeProduct> recipeProductList) throws SQLException {
         long recipeId = 0;
         ContentValues initialValues = itemToValues(recipe, false);
-
+        Log.d(TAG, "insertItem: "+ recipeProductList.toString());
         try {
             this.mDb.beginTransaction();
             recipeId = this.mDb.insert(RECIPE_TABLE, null, initialValues);
@@ -74,7 +74,7 @@ public class RecipeDBAdapter {
                 long recipeProductId = recipeProductDBAdapter.insertItem(recipeProduct, this.mDb);
                 if (recipeProductId<1){
                     Log.e(TAG,"Error trying to insert recipe product");
-                    break;
+                    throw new Exception("Error trying to insert recipe product");
                 }
             }
             //recipeProductDBAdapter.close();

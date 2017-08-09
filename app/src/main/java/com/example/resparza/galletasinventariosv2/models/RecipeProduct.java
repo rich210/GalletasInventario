@@ -68,4 +68,15 @@ public class RecipeProduct {
     public void setProductName(String productName) {
         this.productName = productName;
     }
+
+    @Override
+    public String toString() {
+        return "RecipeProduct{" +
+                "recipeId=" + recipeId +
+                ", productId=" + productId +
+                ", measureTypeId=" + measureTypeId +
+                ", productQuantity=" + productQuantity +
+                ", productName='" + productName + '\'' +
+                '}';
+    }
 }

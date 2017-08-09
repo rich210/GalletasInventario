@@ -201,6 +201,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     /**
      * Add layouts for products
      */
+    //TODO: add only layout form_recipe_products for better performance
     public void addProductForm(final RecipeProduct recipeProduct) {
         if (numberOfLinearLayout <= 19) {
 
@@ -435,6 +436,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                     isProductValid = false;
                 }
                 RecipeProduct recipeProduct = new RecipeProduct(product.getProductId(), product.getMeasureType().getMeasureTypeId(), Float.valueOf(quantity.toString()));
+                recipeProduct.setProductName(product.getProductName());
                 if(isUpdate){
                     recipeProduct.setRecipeId(Long.valueOf( this.tvRecipeId.getText().toString()));
                 }
@@ -458,13 +460,15 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
                     try {
                         recipeDBAdapter.open();
                         if(!isUpdate){
-                            recipe.setRecipeId(recipeDBAdapter.insertItem(recipe,recipeProducts)); ;
+                            Log.d(TAG, "saveRecipe: "+ recipeProducts.toString());
+                            recipe.setRecipeId(recipeDBAdapter.insertItem(recipe,recipeProducts));
                             if (recipe.getRecipeId()>0){
                                 Log.d(TAG, "added recipe : " + recipe.getRecipeId() + " " + recipe.getRecipeName());
                                 setResult(RESULT_OK);
                                 recipeDBAdapter.close();
                                 finish();
                             }else {
+                                recipeDBAdapter.close();
                                 Log.e(TAG, "saveRecipe: Error saving recipe");
                             }
                         }else{

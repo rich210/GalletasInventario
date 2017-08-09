@@ -165,7 +165,7 @@ public class Recipe {
                 "recipeId=" + recipeId +
                 ", recipeName='" + recipeName + '\'' +
                 ", quantity=" + quantity +
-                ", recipeProducts=" + recipeProducts +
+                ", recipeProducts=" + recipeProducts.toString() +
                 ", measureType=" + measureType +
                 ", recipeCost=" + recipeCost +
                 ", recipeImagePath='" + recipeImagePath + '\'' +
