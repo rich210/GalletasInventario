@@ -31,5 +31,6 @@
     <string-array name="orderSellOption">
         <item>pz</item>
         <item>total</item>
+        <item>%</item>
     </string-array>
 </resources>

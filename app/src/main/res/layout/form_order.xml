@@ -18,7 +18,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="18dp"
+                android:textSize="@dimen/TextSize"
                 android:paddingTop="6dp"
                 android:textColor="@color/colorPrimaryTextDark"
                 android:id="@+id/txtOrderId"
@@ -29,16 +29,16 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="20dp"
-                android:hint="Nombre del Cliente"
+                android:hint="@string/orderClientName"
                 android:inputType="textCapWords"
                 android:id="@+id/etClientName"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/txtDeliveryDate"
-                android:text="Fecha de entrega"
+                android:text="@string/orderDeliverDate"
                 android:textColor="@color/colorPrimaryTextDark"
-                android:textSize="17dp"
+                android:textSize="17sp"
                 android:layout_marginRight="30dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginTop="10dp"
@@ -50,7 +50,6 @@
                 android:layout_marginRight="30dp"
                 android:layout_marginTop="10dp"
                 android:layout_below="@id/txtDeliveryDate"
-                android:onClick="showDatePickerDialog"
                 android:id="@+id/dpDeliveryDate"
                 android:textColor="@color/colorPrimaryText"
                 android:datePickerMode="spinner"
@@ -77,7 +76,8 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="80dp"
                     android:layout_marginRight="80dp"
-                    android:padding="2dp"/>
+                    android:padding="2dp"
+                    android:contentDescription="@string/orderAddRecipe"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -87,8 +87,8 @@
                         android:layout_width="1dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.50"
-                        android:text="Costo Total de la orden:"
-                        android:textSize="18dp"
+                        android:text="@string/orderTotalCost"
+                        android:textSize="@dimen/TextSize"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryTextDark"
                         android:layout_marginRight="20dp"
@@ -102,7 +102,7 @@
                         android:layout_marginRight="20dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="10dp"
-                        android:textSize="18dp"
+                        android:textSize="@dimen/TextSize"
                         android:textColor="@color/colorPrimaryTextDark"/>
                 </LinearLayout>
 
@@ -115,8 +115,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
-                        android:text="Total venta:"
-                        android:textSize="18dp"
+                        android:text="@string/orderTotalSell"
+                        android:textSize="@dimen/TextSize"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryTextDark"
                         android:layout_marginTop="10dp"/>
@@ -125,7 +125,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
                         android:layout_marginTop="5dp"
-                        android:hint="Venta"
+                        android:hint="@string/orderSell"
                         android:focusable="false"
                         android:id="@+id/etTotalSell"
                         android:inputType="numberDecimal"
@@ -140,8 +140,8 @@
                         android:layout_width="1dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.50"
-                        android:text="Ganancia: "
-                        android:textSize="18dp"
+                        android:text="@string/orderGaintxt"
+                        android:textSize="@dimen/TextSize"
                         android:textAlignment="center"
                         android:textColor="@color/colorPrimaryTextDark"
                         android:layout_marginRight="20dp"
@@ -155,7 +155,7 @@
                         android:layout_marginRight="20dp"
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="10dp"
-                        android:textSize="18dp"
+                        android:textSize="@dimen/TextSize"
                         android:textColor="@color/colorPrimaryTextDark"/>
                 </LinearLayout>
 
@@ -174,7 +174,7 @@
                     android:textColor="@color/errorText"
                     android:id="@+id/tvErrorSpinnerOrderState"
                     android:visibility="gone"
-                    android:textSize="18dp"/>
+                    android:textSize="@dimen/TextSize"/>
                 <Button
                     android:id="@+id/btnSaveOrder"
                     android:layout_width="match_parent"
@@ -183,8 +183,8 @@
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="30dp"
                     android:background="@color/colorPrimary"
-                    android:text="  Guardar"
-                    android:drawableLeft="@drawable/ic_save"
+                    android:text="@string/save"
+                    android:drawableStart="@drawable/ic_save"
                     android:padding="15dp"
                     android:textColor="@color/colorPrimaryText" />
             </LinearLayout>

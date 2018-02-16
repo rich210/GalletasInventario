@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GalletasInventariosV2</string>
+    <string name="app_name">Galletas decoradas de Liz </string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -62,6 +62,14 @@
     <string name="menuHome">Principal</string>
 
     <string name="mainDateBefore">No se puede selecionar un dia anterior a la fecha actual</string>
+    <string name="save">Guardar</string>
+    <string name="orderGaintxt">Ganancia:</string>
+    <string name="orderSell">Venta</string>
+    <string name="orderTotalSell">Total venta:</string>
+    <string name="orderTotalCost">Costo Total de la orden:</string>
+    <string name="orderDeliverDate">Fecha de entrega</string>
+    <string name="orderClientName">Nombre del Cliente</string>
+    <string name="orderAddRecipe">Añadir receta</string>
 
 
 </resources>
