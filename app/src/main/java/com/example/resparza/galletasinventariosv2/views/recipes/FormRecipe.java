@@ -204,16 +204,15 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
     //TODO: add only layout form_recipe_products for better performance
     public void addProductForm(final RecipeProduct recipeProduct) {
         if (numberOfLinearLayout <= 19) {
-
-            LinearLayout.LayoutParams llProductParamas = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-            LinearLayout llProductContainer = new LinearLayout(this);
-            LinearLayout llProductQuantity = new LinearLayout(this);
-            Spinner spinnerProduct = new Spinner(this);
+            LinearLayout linearLayout = (LinearLayout)View.inflate(this,R.layout.form_recipe_product,null);
+            //LinearLayout.LayoutParams llProductParamas = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+            //LinearLayout llProductContainer = linearLayout.findViewById();
+            //LinearLayout llProductQuantity = new LinearLayout(this);
+            Spinner spinnerProduct = (Spinner)linearLayout.findViewById(R.id.spinnerProduct);
             SpinnerProductAdapter productAdapter = getProducts();
-            Spinner spinnerMeasureSymbol = new Spinner(this);
-            EditText etProductQuantity = new EditText(this);
-            //TextView tvMeasureSymbol = new TextView(this);
-            ImageButton ibRemoveProduct = new ImageButton(this);
+            Spinner spinnerMeasureSymbol = (Spinner)linearLayout.findViewById(R.id.spinnerMeasureSymbol);
+            EditText etProductQuantity = (EditText)linearLayout.findViewById(R.id.txtProductQuantity);
+            ImageButton ibRemoveProduct = (ImageButton)linearLayout.findViewById(R.id.btnRemoveProduct);
             spinnerProduct.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -241,43 +240,43 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
 
                 }
             });
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParams.setMargins(50, 0, 50, 0);
-            spinnerProduct.setLayoutParams(layoutParams);
+            //LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            //layoutParams.setMargins(50, 0, 50, 0);
+            //spinnerProduct.setLayoutParams(layoutParams);
             spinnerProduct.setAdapter(productAdapter);
-            etProductQuantity.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.5f));
-            etProductQuantity.setHint(R.string.recipeFormQuantity);
-            etProductQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            //etProductQuantity.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.5f));
+            //etProductQuantity.setHint(R.string.recipeFormQuantity);
+            //etProductQuantity.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
             if(recipeProduct != null){
                 spinnerProduct.setSelection(productAdapter.getPositionById(recipeProduct.getProductId()));
                 etProductQuantity.setText(String.valueOf(recipeProduct.getProductQuantity()));
             }
-            spinnerMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
-            ibRemoveProduct.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
-            ibRemoveProduct.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_minus));
+            //spinnerMeasureSymbol.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 0.3f));
+            //ibRemoveProduct.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
+            //ibRemoveProduct.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_minus));
             ibRemoveProduct.setOnClickListener(this);
 
             if (linearLayoutArray.size()== 0){
                 ibRemoveProduct.setVisibility(View.GONE);
             }
 
-            llProductContainer.setLayoutParams(llProductParamas);
-            llProductContainer.setOrientation(LinearLayout.VERTICAL);
-            llProductContainer.setId(View.generateViewId());
+            //llProductContainer.setLayoutParams(llProductParamas);
+            //llProductContainer.setOrientation(LinearLayout.VERTICAL);
+            //llProductContainer.setId(View.generateViewId());
 
-            llProductParamas.setMargins(0, 10, 0, 0);
-            llProductQuantity.setLayoutParams(llProductParamas);
-            llProductQuantity.addView(etProductQuantity);
-            llProductQuantity.addView(spinnerMeasureSymbol);
-            llProductQuantity.addView(ibRemoveProduct);
+            //llProductParamas.setMargins(0, 10, 0, 0);
+            //llProductQuantity.setLayoutParams(llProductParamas);
+            //llProductQuantity.addView(etProductQuantity);
+            //llProductQuantity.addView(spinnerMeasureSymbol);
+            //llProductQuantity.addView(ibRemoveProduct);
 
-            llProductContainer.addView(spinnerProduct);
-            llProductContainer.addView(llProductQuantity);
+            //llProductContainer.addView(spinnerProduct);
+            //llProductContainer.addView(llProductQuantity);
 
-            linearLayoutIds.add(new Integer(llProductContainer.getId()));
-            linearLayoutArray.add(llProductContainer);
+            linearLayoutIds.add(new Integer(linearLayout.getId()));
+            linearLayoutArray.add(linearLayout);
 
-            llMainProducts.addView(llProductContainer);
+            llMainProducts.addView(linearLayout);
             numberOfLinearLayout++;
         } else{
             Toast.makeText(FormRecipe.this, "No se puede añadir mas prodcutos", Toast.LENGTH_SHORT).show();
@@ -289,13 +288,15 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
      * @param v is the button to check which layout is been clicked
      */
     public void removeProductForm(View v){
-        LinearLayout linearLayout = (LinearLayout)v.getParent().getParent();
+        LinearLayout linearLayout = (LinearLayout)v.getParent();
+        //Log.d(TAG, "removeProductForm: "+ linearLayout.toString());
+        //Log.d(TAG, "removeProductForm: "+linearLayout.getChildAt(0));
         Spinner productSpinner = (Spinner) linearLayout.getChildAt(0);
         Product product = (Product) productSpinner.getSelectedItem();
         productsIds.remove(new Long(product.getProductId()));
         linearLayoutIds.remove(new Integer(linearLayout.getId()));
         linearLayoutArray.remove(linearLayout);
-        Log.d(TAG, linearLayoutIds.get(linearLayoutIds.size()-1).toString());
+        //Log.d(TAG, linearLayoutIds.get(linearLayoutIds.size()-1).toString());
         numberOfLinearLayout--;
         llMainProducts.removeView(linearLayout);
     }
@@ -454,6 +455,7 @@ public class FormRecipe extends AppCompatActivity implements View.OnClickListene
             }
             recipe.setRecipeName(recipeName.toString());
             recipe.setQuantity(Integer.valueOf(portions.toString()));
+            recipe.setRecipeInstructions(instructions.toString());
 
             if (isProductValid){
 
